@@ -172,7 +172,8 @@ class LoginPageState extends State<LoginPage> {
             idCustomer: responseJson[0].id.toString(),
             idLanguage: "1",
             idShop: "1",
-            idShopGroup: "1"
+            idShopGroup: "1",
+            idCarrier: "3"
         );
         var cartBody = {};
         cartBody["carts"] = newCart.toMap();

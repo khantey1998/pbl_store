@@ -4,6 +4,8 @@ class Customer{
   String lastName;
   String email;
   String id;
+  String idShop;
+  String idLang;
   String password;
   String securityKey;
   String active;
@@ -11,7 +13,7 @@ class Customer{
   AssociationModel associationModel;
 
 
-  Customer({this.firstName, this.lastName, this.idDefaultGroup, this.id, this.password, this.securityKey, this.email, this.active, this.associationModel});
+  Customer({this.idShop, this.idLang,this.firstName, this.lastName, this.idDefaultGroup, this.id, this.password, this.securityKey, this.email, this.active, this.associationModel});
   factory Customer.fromJson(Map<String, dynamic> parsedJson) {
     return Customer(
         firstName: parsedJson['firstname'] as String,
@@ -31,6 +33,8 @@ class Customer{
     map["email"] = this.email;
     map["active"] = this.active;
     map["id"] = this.id;
+    map["id_shop"] = this.idShop;
+    map["id_lang"] = this.idLang;
     //map["associations"] = this.associationModel;
     map["associations"] = associationModel.groupMap();
     map["id_default_group"] = this.idDefaultGroup;

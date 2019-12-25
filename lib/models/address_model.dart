@@ -33,6 +33,7 @@ class AddressModel{
   }
   Map toMap(){
     var map = Map<String, dynamic>();
+    map["id"] = this.id;
     map["firstname"] = this.firstName;
     map["lastname"] = this.lastName;
     map["id_customer"] = this.idCustomer;

@@ -67,7 +67,9 @@ class _RegisterState extends State<Register>{
           password: _passwordController.text.toString(),
           idDefaultGroup: idDefaultGroup,
           active: "1",
-          associationModel: association
+          associationModel: association,
+          idLang: "1",
+          idShop: "1"
       );
       resBody["customer"] = newCustomer.toMap();
       String str = json.encode(resBody);
@@ -90,7 +92,8 @@ class _RegisterState extends State<Register>{
               idCustomer: responseJson[0].id.toString(),
               idLanguage: "1",
               idShop: "1",
-              idShopGroup: "1"
+              idShopGroup: "1",
+              idCarrier: "3"
           );
           var cartBody = {};
           cartBody["carts"] = newCart.toMap();
@@ -101,6 +104,7 @@ class _RegisterState extends State<Register>{
           Navigator.pushReplacement(_scaffoldKey.currentContext, MaterialPageRoute(builder: (context)=> MainHomePage()));
         }
         else{
+          print(registerRes);
           NetworkUtils.showSnackBar(_scaffoldKey, 'Error Signing Up, Try again');
         }
       } else if(responseJson == 'NetworkError') {

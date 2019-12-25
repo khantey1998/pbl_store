@@ -12,7 +12,12 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:pbl_store/utils/network_utils.dart';
 import 'package:pbl_store/screens/address_screen.dart';
 import 'dart:async';
-
+import 'package:pbl_store/models/order_model.dart';
+import 'package:pbl_store/models/order_row.dart';
+import 'package:pbl_store/models/association_model.dart';
+import 'package:pbl_store/models/address_model.dart';
+import 'package:pbl_store/screens/order_screen.dart';
+import 'dart:convert';
 
 class ShoppingCartScreen extends StatefulWidget {
   ShoppingCartScreen();
@@ -25,9 +30,11 @@ class _ShoppingCartState extends State<ShoppingCartScreen> {
   Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   String baseUrl = "http://3Q49Q5T8GNBFV7MPR7HG9FT4EP92Q4ZB@pblstore.com/api";
   SharedPreferences _sharedPreferences;
+  List<OrderRow> orderRowList;
   var _authToken, _id, _name, _homeResponse;
   bool _isLoading = false;
   ShoppingCart cart;
+  Stream<ShoppingCart> streamCart;
   static TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 16.0);
   final loginButton = Material(
     elevation: 1.0,
@@ -50,11 +57,6 @@ class _ShoppingCartState extends State<ShoppingCartScreen> {
     String authToken = AuthUtils.getToken(_sharedPreferences);
     var id = _sharedPreferences.getString(AuthUtils.userIdKey);
     var name = _sharedPreferences.getString(AuthUtils.nameKey);
-
-    print("authtoken: $authToken");
-
-//    _fetchProfile(authToken);
-
     setState(() {
       _authToken = authToken;
       _id = id;
@@ -66,6 +68,8 @@ class _ShoppingCartState extends State<ShoppingCartScreen> {
   void initState() {
     super.initState();
     _fetchSessionAndNavigate();
+    streamCart = BlocProvider.of<GlobalBloc>(context).shoppingCartBloc.cartStream;
+    orderRowList = List();
   }
 
   @override
@@ -73,7 +77,7 @@ class _ShoppingCartState extends State<ShoppingCartScreen> {
     return Scaffold(
       body: StreamBuilder(
           stream:
-              BlocProvider.of<GlobalBloc>(context).shoppingCartBloc.cartStream,
+              streamCart,
           builder: (context, snapshot) {
             if (!snapshot.hasData) {
               return ListView(
@@ -115,6 +119,7 @@ class _ShoppingCartState extends State<ShoppingCartScreen> {
               );
             } else {
               cart = snapshot.data;
+
               if (cart.products.length == 0) {
                 return ListView(
                   padding: const EdgeInsets.all(32),
@@ -156,198 +161,398 @@ class _ShoppingCartState extends State<ShoppingCartScreen> {
                 );
               }
               return Container(
-                padding: EdgeInsets.all(4),
-                child: Column(children: [
-                  Card(
-                    child: ListTile(
-                      leading: Text("Total Price",
-                          style: Theme.of(context).textTheme.subhead),
-                      trailing: Text(cart.totalPrice.toString() + "\$",
-                          style: Theme.of(context).textTheme.headline),
-                    ),
-                  ),
-                  Expanded(
-                    flex: 3,
-                    child: ListView(
-
-                      children: <Widget>[
+                width: double.infinity,
+                height: double.infinity,
+                child: Stack(
+                  children: <Widget>[
+                    SingleChildScrollView(
+                      padding: EdgeInsets.all(4),
+                      child: Column(children: [
                         Card(
-                          child: ExpansionTile(
-                              title: Text("Products (" +
-                                  cart.products.length.toString() +
-                                  ")"),
-                              children: getProductTiles()),
+                          child: ListTile(
+                            leading: Text("All Products",
+                                style: Theme.of(context).textTheme.subhead),
+                            trailing: Text("${cart.products.length}",
+                                style: Theme.of(context).textTheme.headline),
+                          ),
                         ),
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                    flex: 2,
-                    child: Card(
-                      child: Column(
-                        children: <Widget>[
-//                          Container(
-//                            child: ListTile(
-//                              title: Text(
-//                                "Secured Information Signing Up",
-//                              ),
-//                              leading: Icon(Icons.check_box),
-//                            ),
-//                          ),
-                          Container(
-                            child: ListTile(
-                              title: Text(
-                                " Free Delivery for Phnom Penh",
-                              ),
-                              leading: Icon(Icons.directions_car),
-                            ),
+                        Card(
+                          child: Column(
+                            children: getProductTiles(),
+                            mainAxisSize: MainAxisSize.min,
                           ),
-                          Container(
-                            child: ListTile(
-                              title: Text(
-                                " 30-day Payback Warranty",
-                              ),
-                              leading: Icon(Icons.compare_arrows),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                   SizedBox(
-                      width: double.infinity,
-                      child: RaisedButton(
-                        color: Colors.blueGrey,
-                        child: Text("Order now!", style: TextStyle(color: Colors.white70),),
-                        onPressed: () async{
-
-                          var responseJson = await NetworkUtils.checkAddress(_id);
-
-                          if(responseJson == null) {
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context){
-                                return AlertDialog(
-                                  content: Text("Address haven't added yet. Do you want to add your address now?"),
-                                  actions: <Widget>[
-                                    FlatButton(
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      },
-                                      child: Text("No"),
-                                    ),
-                                    FlatButton(
-                                      onPressed: (){
-                                        Navigator.of(context).pop();
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) => Address()),
-                                        );
-                                      },
-                                      child: Text("Yes"),
-                                    ),
-                                  ],
-                                );
-                              }
-                            );
-
-                          }
-                          else{
-
-                            showDialog(
-                                context: context,
-                                builder: (BuildContext context){
-                                  return AlertDialog(
-                                    content: Text("Order Complete !"),
-                                    actions: <Widget>[
-                                      FlatButton(
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-                                          Navigator.pushReplacement(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) => MainHomePage()),
-                                          );
-                                        },
-                                        child: Text("OKAY"),
+                        ),
+                        FutureBuilder(
+                          future: getAddress(_id),
+                          builder:
+                              (BuildContext context, AsyncSnapshot snapshot) {
+                            if (snapshot.hasData) {
+                              List<AddressModel> address = snapshot.data;
+                              return Card(
+                                child: Container(
+                                  padding: EdgeInsets.fromLTRB(8, 16, 8, 16),
+                                  child: Row(
+                                    children: <Widget>[
+                                      Expanded(
+                                        flex: 2,
+                                        child: Text(
+                                          "Shipping Address: ",
+                                          style: TextStyle(fontSize: 16),
+                                        ),
                                       ),
-
+                                      Expanded(
+                                        flex: 2,
+                                        child: Text(
+                                          "${address[0].address1}, ${address[0].city}, ${address[0].postalCode}, ${address[0].phone}",
+                                          style: TextStyle(fontSize: 16),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        flex: 1,
+                                        child: GestureDetector(
+                                          child: Icon(Icons.edit),
+                                          onTap: () {},
+                                        ),
+                                      ),
                                     ],
-                                  );
-                                }
-                            );
+                                  ),
+                                ),
+                              );
+                            } else {
+                              return Card(
+                                child: Container(
+                                  padding: EdgeInsets.fromLTRB(8, 16, 8, 16),
+                                  child: Row(
+                                    children: <Widget>[
+                                      Expanded(
+                                        flex: 2,
+                                        child: Text(
+                                          "Shipping Address: ",
+                                          style: TextStyle(fontSize: 16),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        flex: 1,
+                                        child: GestureDetector(
+                                          child: Text(
+                                            "Add new address",
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                          onTap: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      Address()),
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            }
+                          },
+                        ),
+                        Card(
+                          child: Column(
+                            children: <Widget>[
+                              Container(
+                                child: ListTile(
+                                  title: Text(
+                                    "Cash on Delivery",
+                                  ),
+                                  leading: Icon(Icons.check_box),
+                                ),
+                              ),
+                              Container(
+                                child: ListTile(
+                                  title: Text(
+                                    " Free Delivery for Phnom Penh",
+                                  ),
+                                  leading: Icon(Icons.directions_car),
+                                ),
+                              ),
+                              Container(
+                                child: ListTile(
+                                  title: Text(
+                                    "30-day Payback Warranty",
+                                  ),
+                                  leading: Icon(Icons.compare_arrows),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Card(
+                          child: ListTile(
+                            leading: Text("Total Price",
+                                style: Theme.of(context).textTheme.subhead),
+                            trailing: Text(cart.totalPrice.toString() + "\$",
+                                style: Theme.of(context).textTheme.headline),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 60,
+                        )
 
-                          }
+//                        SizedBox(
+//                          width: double.infinity,
+//                          child: RaisedButton(
+//                            color: Colors.blueGrey,
+//                            child: Text(
+//                              "Order now!",
+//                              style: TextStyle(color: Colors.white70),
+//                            ),
+//                            onPressed: () async {
+//                              List<AddressModel> responseJson =
+//                                  await NetworkUtils.getAddress(_id);
+//
+//                              if (responseJson == null) {
+//                                showDialog(
+//                                    context: context,
+//                                    builder: (BuildContext context) {
+//                                      return AlertDialog(
+//                                        content: Text(
+//                                            "Address haven't added yet. Do you want to add your address now?"),
+//                                        actions: <Widget>[
+//                                          FlatButton(
+//                                            onPressed: () {
+//                                              Navigator.of(context).pop();
+//                                            },
+//                                            child: Text("No"),
+//                                          ),
+//                                          FlatButton(
+//                                            onPressed: () {
+//                                              Navigator.of(context).pop();
+//                                              Navigator.push(
+//                                                context,
+//                                                MaterialPageRoute(
+//                                                    builder: (context) =>
+//                                                        Address()),
+//                                              );
+//                                            },
+//                                            child: Text("Yes"),
+//                                          ),
+//                                        ],
+//                                      );
+//                                    });
+//                              } else if (responseJson.length > 0) {
+//                                ShoppingCart sendToOrder = snapshot.data;
+//                                print(
+//                                    "cart sending to order: ${sendToOrder.toMap()}");
+//                                Navigator.push(
+//                                  context,
+//                                  MaterialPageRoute(
+//                                      builder: (context) => OrderScreen(
+//                                            cart: sendToOrder,
+//                                            addressList: responseJson,
+//                                            cartID: cart.id,
+//                                          )),
+//                                );
+//                              }
+//
+////                          Scaffold.of(context).showSnackBar(
+////                              SnackBar(content: Text("Order completed!")));
+////                          Navigator.push(
+////                            context,
+////                            MaterialPageRoute(
+////                                builder: (context) => MainHomePage()),
+////                          );
+//                            },
+//                          ),
+//                        ),
+                      ]),
+                    ),
+                    Positioned(
+                      bottom: 0,
+                      left: 4,
+                      right: 4,
+                      child: Align(
+                        alignment: Alignment.bottomCenter,
+                        child: ButtonTheme(
+                          minWidth: double.infinity,
+                          height: 50,
+                          child: FlatButton(
+                            color: Colors.blueGrey,
+                            onPressed: () async {
+                              List<AddressModel> responseJson =
+                                  await NetworkUtils.getAddress(_id);
+                              if (responseJson == null) {
+                                showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        content: Text(
+                                            "Address haven't added yet. Do you want to add your address now?"),
+                                        actions: <Widget>[
+                                          FlatButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                            child: Text("No"),
+                                          ),
+                                          FlatButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        Address()),
+                                              );
+                                            },
+                                            child: Text("Yes"),
+                                          ),
+                                        ],
+                                      );
+                                    });
+                              } else if (responseJson.length > 0) {
+                                AddressModel address = responseJson[0];
 
+                                AssociationModel association =
+                                    AssociationModel(orderRows: orderRowList);
+                                OrderModel newOrder = OrderModel(
+                                  idCart: _sharedPreferences
+                                      .getString(AuthUtils.cartIDKey),
+                                  idCustomer: _id,
+                                  idShop: "1",
+                                  idAddressDelivery: address.id,
+                                  idShopGroup: "1",
+                                  idCurrency: "2",
+                                  idAddressInvoice: address.id,
+                                  idCarrier: "3",
+                                  idLang: "1",
+                                  totalPaidReal: cart.totalPrice.toString(),
+                                  totalPaid: cart.totalPrice.toString(),
+                                  totalPaidTaxExcl: cart.totalPrice.toString(),
+                                  totalPaidTaxIncl: cart.totalPrice.toString(),
+                                  totalProducts: cart.totalPrice.toString(),
+                                  totalProductWt: cart.totalPrice.toString(),
+                                  roundType: "2",
+                                  roundMode: "2",
+                                  payment: "Cash on delivery (COD)",
+                                  module: "ps_cashondelivery",
+                                  association: association,
+                                  conversionRate: "1",
+                                  currentState: "3",
+                                  secureKey: _authToken,
+                                  valid: "1",
+                                );
+                                var orderBody = {};
+                                orderBody["order"] = newOrder.orderMap();
+                                String strOrder = json.encode(orderBody);
 
-//                          BlocProvider.of<GlobalBloc>(context)
-//                              .shoppingCartBloc
-//                              .clearCart();
-//                          Scaffold.of(context).showSnackBar(
-//                              SnackBar(content: Text("Order completed!")));
-//                          Navigator.push(
-//                            context,
-//                            MaterialPageRoute(
-//                                builder: (context) => MainHomePage()),
-//                          );
-                        },
+                                showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        content: Text("Make order?"),
+                                        actions: <Widget>[
+                                          FlatButton(
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                            },
+                                            child: Text("Cancel"),
+                                          ),
+                                          FlatButton(
+                                            onPressed: () async {
+                                              print(strOrder);
+                                              OrderModel result = await NetworkUtils.createOrder(body: strOrder);
+
+                                              BlocProvider.of<GlobalBloc>(context).shoppingCartBloc.clearCart();
+                                              ShoppingCart newCart = ShoppingCart(
+                                                  secureKey: _sharedPreferences.getString(AuthUtils.authTokenKey),
+                                                  idCurrency: "2",
+                                                  idCustomer: _sharedPreferences.getString(AuthUtils.userIdKey),
+                                                  idLanguage: "1",
+                                                  idShop: "1",
+                                                  idShopGroup: "1",
+                                                  idAddressDelivery: address.id,
+                                                  idAddressInvoice: address.id,
+                                                  idCarrier: "3");
+                                              var cartBody = {};
+                                              cartBody["carts"] = newCart.toMap();
+                                              String strCart = json.encode(cartBody);
+                                              ShoppingCart k = await NetworkUtils.createCart(body: strCart);
+                                              print(k.toMap());
+                                              _sharedPreferences.setString(AuthUtils.cartIDKey, k.id);
+                                              print(_sharedPreferences.getString(AuthUtils.cartIDKey));
+                                              List<OrderModel> orderList = await NetworkUtils.getLatestOrder();
+                                              OrderModel latestOrder = orderList[0];
+                                              OrderModel updateOder = newOrder;
+                                              updateOder.reference = latestOrder.reference;
+                                              updateOder.deliveryDate = latestOrder.deliveryDate;
+                                              updateOder.invoiceDate = latestOrder.invoiceDate;
+                                              updateOder.id = latestOrder.id;
+                                              updateOder.deliveryNumber = latestOrder.deliveryNumber;
+                                              updateOder.invoiceNumber = latestOrder.invoiceNumber;
+
+                                              var updateOrderBody = {};
+                                              updateOrderBody["order"] = updateOder.updateOrderMap();
+                                              String updateStrOrder = json.encode(updateOrderBody);
+                                              print(updateStrOrder);
+                                              await NetworkUtils.updateOrder(body: updateStrOrder);
+                                              Navigator.pop(context);
+                                              setState(() {
+                                                streamCart = BlocProvider.of<GlobalBloc>(context).shoppingCartBloc.cartStream;
+
+                                              });
+                                            },
+                                            child: Text("Yes !"),
+                                          ),
+                                        ],
+                                      );
+                                    });
+                              }
+                            },
+                            child: Text(
+                              'Order',
+                              style: TextStyle(
+                                fontSize: 20,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
                     ),
-                ]),
+                  ],
+                ),
               );
             }
           }),
     );
   }
-  _showLoading() {
-    setState(() {
-      _isLoading = true;
-    });
+
+  getAddress(String id) async {
+    return await NetworkUtils.getAddress(id);
   }
 
-  _hideLoading() {
-    setState(() {
-      _isLoading = false;
-    });
-  }
-  Widget _loadingScreen() {
-    return new Container(
-        margin: const EdgeInsets.only(top: 100.0),
-        child: new Center(
-            child: new Column(
-              children: <Widget>[
-                new CircularProgressIndicator(
-                    strokeWidth: 4.0
-                ),
-                new Container(
-                  padding: const EdgeInsets.all(8.0),
-                  child: new Text(
-                    'Please Wait',
-                    style: new TextStyle(
-                        color: Colors.grey.shade500,
-                        fontSize: 16.0
-                    ),
-                  ),
-                )
-              ],
-            )
-        )
-    );
-  }
   List<Widget> getProductTiles() {
     List<Widget> list = [];
     if (cart != null) {
       for (ProductModel p in cart.products) {
+        print("my new cart: ${cart.products.length}");
+        OrderRow orderRow = OrderRow(
+            productId: p.id,
+            productName: p.name,
+            productPrice: p.price,
+            productQuantity: p.amount.toString(),
+            productAttributeID: "0");
+        orderRowList.add(orderRow);
         String name = p.name;
         String price = p.price.toString();
         int amount = p.amount;
         list.add(
           Card(
             borderOnForeground: true,
-            margin: const EdgeInsets.all(0.5),
+            margin: const EdgeInsets.all(4),
             elevation: 1.0,
-            shape: Border(left: BorderSide(color: Colors.blue, width: 4)),
+            //shape: Border(left: BorderSide(color: Colors.blue, width: 4)),
 //              color: Colors.white70,
             child: Row(
               children: <Widget>[
@@ -357,7 +562,7 @@ class _ShoppingCartState extends State<ShoppingCartScreen> {
 //                ),
                 CachedNetworkImage(
                   imageUrl:
-                  '$baseUrl/images/products/${p.id.toString()}/${p.idDefaultImage}',
+                      '$baseUrl/images/products/${p.id.toString()}/${p.idDefaultImage}',
                   placeholder: (context, url) =>
                       Image.asset('assets/product.jpg'),
                   fit: BoxFit.fitHeight,
@@ -372,27 +577,31 @@ class _ShoppingCartState extends State<ShoppingCartScreen> {
                         borderOnForeground: false,
                         semanticContainer: true,
                         clipBehavior: Clip.antiAliasWithSaveLayer,
-                        child: ListTile(
-                          title: Text(
-                            name,
-                            style: TextStyle(
-                              fontSize: 16.0,
-                            ),
-                          ),
-                          subtitle: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.max,
-                            children: <Widget>[
-                              Text(
-                                "US \$${double.parse(price)}",
+                        child: Column(
+                          children: <Widget>[
+                            Container(
+                              width: double.infinity,
+                              child: Text(
+                                name,
                                 style: TextStyle(
-                                    fontSize: 14.0,
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold),
+                                  fontSize: 16.0,
+                                ),
                               ),
-                              SizedBox(
-                                width: 8.0,
-                              ),
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.max,
+                              children: <Widget>[
+                                Text(
+                                  "US \$${double.parse(price)}",
+                                  style: TextStyle(
+                                      fontSize: 14.0,
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                SizedBox(
+                                  width: 8.0,
+                                ),
 //                            Text(
 //                              "US \$33",
 //                              style: TextStyle(
@@ -411,24 +620,14 @@ class _ShoppingCartState extends State<ShoppingCartScreen> {
 //                                color: Colors.red,
 //                              ),
 //                            ),
-                            ],
-                          ),
+                              ],
+                            ),
+                          ],
                         ),
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: <Widget>[
-                          Container(
-                            padding: EdgeInsets.all(10.0),
-                            child: Column(
-                              children: <Widget>[
-                                Text(
-                                  "Free Shipping",
-                                  style: TextStyle(color: Colors.blue),
-                                )
-                              ],
-                            ),
-                          ),
                           Container(
                             padding: EdgeInsets.all(5.0),
                             child: Row(
@@ -442,7 +641,6 @@ class _ShoppingCartState extends State<ShoppingCartScreen> {
                                           fontFamily: 'MaterialIcons'),
                                       color: Colors.black),
                                   backgroundColor: Colors.white70,
-
                                 ),
                                 Text("$amount",
                                     style: new TextStyle(

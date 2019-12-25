@@ -42,7 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           if (snapshot.hasData) {
             productList = snapshot.data;
-
+            print("all products: ${productList.length}");
             for (ProductModel i in productList) {
               for (var j in i.associations.categories) {
                 if (j.id == "4") {
@@ -267,7 +267,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           height: 50,
                         ),
                         Container(
-                          height: 100,
+                          height: 130,
                           child: ListView.builder(
                             itemCount: productList.length,
                             scrollDirection: Axis.horizontal,
@@ -281,9 +281,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                     imageUrl:
                                         '$baseUrl/images/products/${productList[index].id.toString()}/${productList[index].idDefaultImage}',
                                     placeholder: (context, url) =>
-                                        Image.asset('assets/product.jpg'),
+                                        Image.asset('assets/p.png'),
                                     fit: BoxFit.fitHeight,
-                                    width: 100,
+                                    width: 130,
                                   ),
                                 ),
                                 onTap: () {
@@ -334,7 +334,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           height: 50,
                         ),
                         Container(
-                          height: 100,
+                          height: 130,
                           child: ListView.builder(
                             itemCount: powerToolList.length,
                             scrollDirection: Axis.horizontal,
@@ -348,9 +348,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                     imageUrl:
                                         '$baseUrl/images/products/${powerToolList[index].id.toString()}/${powerToolList[index].idDefaultImage}',
                                     placeholder: (context, url) =>
-                                        Image.asset('assets/product.jpg'),
+                                        Image.asset('assets/p.png'),
                                     fit: BoxFit.fitHeight,
-                                    width: 100,
+                                    width: 130,
                                   ),
                                 ),
                                 onTap: () {
@@ -400,7 +400,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           height: 50,
                         ),
                         Container(
-                          height: 100,
+                          height: 130,
                           child: ListView.builder(
                             itemCount: waterproofList.length,
                             scrollDirection: Axis.horizontal,
@@ -423,9 +423,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                     imageUrl:
                                         '$baseUrl/images/products/${waterproofList[index].id.toString()}/${waterproofList[index].idDefaultImage}',
                                     placeholder: (context, url) =>
-                                        Image.asset('assets/product.jpg'),
+                                        Image.asset('assets/p.png'),
                                     fit: BoxFit.fitHeight,
-                                    width: 100,
+                                    width: 130,
                                   ),
                                 ),
                               );
@@ -466,7 +466,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           height: 50,
                         ),
                         Container(
-                          height: 100,
+                          height: 130,
                           child: ListView.builder(
                             itemCount: industrySupplyList.length,
                             scrollDirection: Axis.horizontal,
@@ -489,9 +489,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                     imageUrl:
                                         '$baseUrl/images/products/${industrySupplyList[index].id.toString()}/${industrySupplyList[index].idDefaultImage}',
                                     placeholder: (context, url) =>
-                                        Image.asset('assets/product.jpg'),
+                                        Image.asset('assets/p.png'),
                                     fit: BoxFit.fitHeight,
-                                    width: 100,
+                                    width: 130,
                                   ),
                                 ),
                               );
@@ -535,7 +535,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     imageUrl:
                                         '$baseUrl/images/products/${product.id.toString()}/${product.idDefaultImage}',
                                     placeholder: (context, url) =>
-                                        Image.asset('assets/product.jpg'),
+                                        Image.asset('assets/p.png'),
                                     width: 150,
                                     fit: BoxFit.fitHeight,
                                   ),
@@ -543,7 +543,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                     height: 10,
                                   ),
                                   Text(product.name),
-                                  Text("\$${double.parse(product.price)}"),
+                                  SizedBox(
+                                    height: 5,
+                                  ),
+                                  Text("\$${double.parse(product.price)}", style: TextStyle(fontWeight: FontWeight.bold),),
                                 ],
                               ),
                               onTap: () {

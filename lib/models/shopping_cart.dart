@@ -19,6 +19,7 @@ class ShoppingCart {
   String secureKey;
   String idShopGroup;
   String idShop;
+  String idCarrier;
   AssociationModel association;
   SharedPreferences _sharedPreferences;
   Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
@@ -27,7 +28,7 @@ class ShoppingCart {
 
   ShoppingCart({this.totalPrice, this.idShopGroup, this.id, this.idShop,
     this.idAddressDelivery, this.idAddressInvoice, this.idCurrency,
-    this.idCustomer, this.idLanguage, this.secureKey, this.association});
+    this.idCustomer, this.idLanguage, this.secureKey, this.association, this.idCarrier});
 
   factory ShoppingCart.fromJson(Map<String, dynamic> parsedJson) {
 
@@ -52,7 +53,7 @@ class ShoppingCart {
         association: cartAsso,
         idCustomer: _sharedPreferences.getString(AuthUtils.userIdKey),
         idCurrency: "2",
-        idLanguage: "2",
+        idLanguage: "1",
         idShop: "1",
         idShopGroup: "1",
         secureKey: AuthUtils.getToken(_sharedPreferences),
@@ -61,7 +62,6 @@ class ShoppingCart {
       var cartBody = {};
       cartBody["carts"] = cart.toMap();
       String strCart = json.encode(cartBody);
-      print(strCart);
       await NetworkUtils.updateCart(body: strCart);
     }
   }
@@ -93,6 +93,9 @@ class ShoppingCart {
     map["id_lang"] = this.idLanguage;
     map["secure_key"] = this.secureKey;
     map["id"] = this.id;
+    map["id_address_delivery"] = this.idAddressDelivery;
+    map["id_address_invoice"] = this.idAddressInvoice;
+    map["id_carrier "] = this.idCarrier;
     map["id_shop"] = this.idShop;
     map["id_shop_group"] = this.idShopGroup;
     map["associations"] = association != null ? this.association.cartMap(): "";

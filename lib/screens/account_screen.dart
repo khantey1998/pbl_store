@@ -64,6 +64,7 @@ import 'package:pbl_store/models/shopping_cart.dart';
 import 'package:pbl_store/bloc/BlocProvider.dart';
 import 'package:pbl_store/bloc/GlobalBloc.dart';
 import 'package:pbl_store/screens/login.dart';
+import 'package:pbl_store/models/order_model.dart';
 
 class AccountScreen extends StatefulWidget {
   @override
@@ -194,11 +195,17 @@ class _AccountScreenState extends State<AccountScreen> {
               elevation: 5,
               margin: const EdgeInsets.all(0.8),
               borderOnForeground: true,
-              child: ListTile(
-                leading: Icon(Icons.settings),
-                title: Text('Setting'),
-                trailing: Icon(Icons.flag),
-              ),
+              child: GestureDetector(
+                onTap: ()async{
+                  List<OrderModel> order = await NetworkUtils.getLatestOrder();
+                  print(order[0].updateOrderMap());
+                },
+                child: ListTile(
+                  leading: Icon(Icons.settings),
+                  title: Text('Setting'),
+                  trailing: Icon(Icons.flag),
+                ),
+              )
             ),
             Card(
               margin: const EdgeInsets.all(0.0),

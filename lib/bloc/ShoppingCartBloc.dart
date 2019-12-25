@@ -30,7 +30,7 @@ class ShoppingCartBloc implements BlocBase {
 
 
   ShoppingCartBloc() {
-    getCarRow();
+    getCartRow();
     itemAdditionController.stream.listen(handleItemAdd);
     itemSubtractionController.stream.listen(handleItemRem);
   }
@@ -43,7 +43,6 @@ class ShoppingCartBloc implements BlocBase {
     cart.addProduct(item);
     cart.calculate();
     _cart.add(cart);
-    print("Added product to shopping cart");
     return;
   }
 
@@ -65,7 +64,7 @@ class ShoppingCartBloc implements BlocBase {
     cart.clear();
   }
 
-  getCarRow() async{
+  getCartRow() async{
     _sharedPreferences = await _prefs;
     String auth = AuthUtils.getToken(_sharedPreferences);
     if(auth!=null){

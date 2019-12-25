@@ -6,19 +6,14 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:async';
 import 'package:pbl_store/screens/main_home.dart';
-import 'package:pbl_store/models/shopping_cart.dart';
-import 'package:pbl_store/models/association_model.dart';
-import 'package:html/dom.dart' as htmlParser;
 import 'package:pbl_store/bloc/BlocProvider.dart';
 import 'package:pbl_store/bloc/GlobalBloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:pbl_store/models/cart_rows.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pbl_store/utils/auth_utils.dart';
-import 'package:pbl_store/utils/network_utils.dart';
 import 'package:pbl_store/screens/shoppingcart_screen.dart';
 import 'package:flutter_html/flutter_html.dart';
-import 'package:html/dom.dart' as dom;
+
 
 class ProductDetailPage extends StatefulWidget {
   final ProductModel product;
@@ -35,7 +30,7 @@ class _ProductDetailPageState extends State<ProductDetailPage>
 
   String baseUrl = "http://3Q49Q5T8GNBFV7MPR7HG9FT4EP92Q4ZB@pblstore.com/api";
   StockAvailableModel stock = StockAvailableModel();
-  int _n = 0;
+  int _n = 1;
 
   @override
   void initState() {
@@ -167,7 +162,7 @@ class _ProductDetailPageState extends State<ProductDetailPage>
                             imageUrl:
                                 '$baseUrl/images/products/${widget.product.id.toString()}/${image.id}',
                             placeholder: (context, url) =>
-                                Image.asset('assets/product.jpg'),
+                                Image.asset('assets/p.png'),
                             fit: BoxFit.fitHeight,
                             width: 100,
                           ),
@@ -432,7 +427,7 @@ class _ProductDetailPageState extends State<ProductDetailPage>
                               imageUrl:
                                   '$baseUrl/images/products/${pList[index].id.toString()}/${pList[index].idDefaultImage}',
                               placeholder: (context, url) =>
-                                  Image.asset('assets/product.jpg'),
+                                  Image.asset('assets/p.png'),
                               width: 150,
                               fit: BoxFit.fitHeight,
                             ),
@@ -624,12 +619,9 @@ class _ProductDetailPageState extends State<ProductDetailPage>
                                   timeInSecForIos: 1,
                                   fontSize: 16.0);
 
-                              _n = 0;
+                              _n = 1;
                               Navigator.of(context).pop();
-                              Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => MainHomePage()));
+
                             },
                             child: Text("Add"),
                           ),

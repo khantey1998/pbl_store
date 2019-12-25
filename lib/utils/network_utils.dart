@@ -13,6 +13,7 @@ import 'package:pbl_store/models/product_model.dart';
 import 'package:pbl_store/models/category_model.dart';
 import 'package:pbl_store/models/address_model.dart';
 import 'package:pbl_store/models/manufacturer_model.dart';
+import 'package:pbl_store/models/order_model.dart';
 
 class NetworkUtils {
 	static final String host = productionHost;
@@ -20,7 +21,7 @@ class NetworkUtils {
 	static final String developmentHost = 'http://192.168.31.110:3000';
 
 	static dynamic authenticateUser(String email) async {
-		var uri = host + AuthUtils.endPoint;
+		var uri = 'http://3Q49Q5T8GNBFV7MPR7HG9FT4EP92Q4ZB@pblstore.com' + AuthUtils.endPoint;
 		try {
 			final response = await http.get(
 				uri,
@@ -83,6 +84,7 @@ class NetworkUtils {
 
 	static checkExistingEmail(String email) async {
 		var url = Uri.http(host, "/api/customers", {'filter[email]': email});
+		print(url);
 		try {
 			final response = await http.get(
 				url,
@@ -104,6 +106,7 @@ class NetworkUtils {
 	static fetch(String email) async {
 		var url = Uri.http(
 				host, "/api/customers", {'filter[email]': email, 'display': 'full'});
+		print(url);
 		try {
 			final response = await http.get(
 				url,
@@ -123,14 +126,15 @@ class NetworkUtils {
 
 	static dynamic registerUser({String body}) async {
 		var uri = host + AuthUtils.endPoint;
+		print(body);
 		try {
 			return await http.post(
-					uri,
+					"http://3Q49Q5T8GNBFV7MPR7HG9FT4EP92Q4ZB@pblstore.com/api/customers",
 					body: body,
 					headers: {
 						"Content-Type": "application/json"
 					}
-			).then((a) => a.statusCode == 201 ? "success" : "error");
+			).then((a) => a.statusCode == 201 ? "success" : a.statusCode);
 		} catch (exception) {
 			print(exception);
 			if (exception.toString().contains('SocketException')) {
@@ -239,35 +243,57 @@ class NetworkUtils {
 	}
 
 	static dynamic createOrder({String body}) async {
-		var url = Uri.http(host, "/api/orders");
-		try {
-			var response = await http.post(
-					url,
-					body: body,
-					headers: {
-						"Content-Type": "application/json"
-					}
-			);
-			final responseJson = json.decode(response.body)['cart'];
-			return ShoppingCart.fromJson(responseJson);
-		} catch (exception) {
-			if (exception.toString().contains('SocketException')) {
-				return 'NetworkError';
-			} else {
-				return null;
-			}
-		}
-	}
+    var url = Uri.http(host, "/api/orders");
+    try {
+      var response = await http.post(
+          url,
+          body: body,
+          headers: {
+            "Content-Type": "application/json"
+          }
+      );
+      final responseJson = json.decode(response.body)['order'];
+      print(response.body);
+      return OrderModel.fromJson(responseJson);
+    } catch (exception) {
+      if (exception.toString().contains('SocketException')) {
+        return 'NetworkError';
+      } else {
+        return null;
+      }
+    }
+  }
+  static dynamic updateOrder({String body}) async {
+    var url = Uri.http(host, "/api/orders");
+    try {
+      var response = await http.put(
+          url,
+          body: body,
+          headers: {
+            "Content-Type": "application/json"
+          }
+      );
+      final responseJson = json.decode(response.body)['order'];
+      print(response.body);
+      return OrderModel.fromJson(responseJson);
+    } catch (exception) {
+      if (exception.toString().contains('SocketException')) {
+        return 'NetworkError';
+      } else {
+        return null;
+      }
+    }
+  }
 
-	static checkAddress(String idCustomer) async {
+	static getAddress(String idCustomer) async {
 		var url = Uri.http(
-				host, "/api/addresses", {'filter[id_customer]': idCustomer});
+				host, "/api/addresses", {'filter[id_customer]': idCustomer, 'display':'full'});
 		try {
 			final response = await http.get(
 				url,
 			);
 			final responseJson = (json.decode(response.body)['addresses'] as List)
-					.map((data) => Customer.fromJson(data))
+					.map((data) => AddressModel.fromJson(data))
 					.toList();
 
 			return responseJson;
@@ -316,6 +342,26 @@ class NetworkUtils {
 					.toList();
 			return responseJson;
 		} catch (exception) {
+			if (exception.toString().contains('SocketException')) {
+				return 'NetworkError';
+			} else {
+				return null;
+			}
+		}
+	}
+	static dynamic getLatestOrder()async{
+		var url = Uri.http(host, "/api/orders",{'display': 'full','limit':'1','sort':'id_DESC'});
+		try {
+			final response = await http.get(
+				url,
+			);
+			final responseJson = (json.decode(response.body)['orders'] as List)
+					.map((data) => OrderModel.fromJson(data))
+					.toList();
+
+			return responseJson;
+		} catch (exception) {
+			print(exception);
 			if (exception.toString().contains('SocketException')) {
 				return 'NetworkError';
 			} else {
