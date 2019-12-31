@@ -27,6 +27,7 @@ class ShoppingCartScreen extends StatefulWidget {
 }
 
 class _ShoppingCartState extends State<ShoppingCartScreen> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   String baseUrl = "http://3Q49Q5T8GNBFV7MPR7HG9FT4EP92Q4ZB@pblstore.com/api";
   SharedPreferences _sharedPreferences;
@@ -52,6 +53,17 @@ class _ShoppingCartState extends State<ShoppingCartScreen> {
     ),
   );
 
+  _showLoading() {
+    setState(() {
+      _isLoading = true;
+    });
+  }
+
+  _hideLoading() {
+    setState(() {
+      _isLoading = false;
+    });
+  }
   _fetchSessionAndNavigate() async {
     _sharedPreferences = await _prefs;
     String authToken = AuthUtils.getToken(_sharedPreferences);
@@ -74,7 +86,33 @@ class _ShoppingCartState extends State<ShoppingCartScreen> {
 
   @override
   Widget build(BuildContext context) {
+
+    void _onLoading() {
+      if(_isLoading){
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (BuildContext context) {
+            return Dialog(
+              child: Container(
+                width: double.infinity,
+                height: 200,
+                child: new Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    new CircularProgressIndicator(),
+                    new Text("Loading"),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      }
+    }
     return Scaffold(
+      key: _scaffoldKey,
       body: StreamBuilder(
           stream:
               streamCart,
@@ -182,6 +220,14 @@ class _ShoppingCartState extends State<ShoppingCartScreen> {
                             mainAxisSize: MainAxisSize.min,
                           ),
                         ),
+                        Card(
+                          child: ListTile(
+                            leading: Text("Total Price",
+                                style: Theme.of(context).textTheme.subhead),
+                            trailing: Text(cart.totalPrice.toString() + "\$",
+                                style: Theme.of(context).textTheme.headline),
+                          ),
+                        ),
                         FutureBuilder(
                           future: getAddress(_id),
                           builder:
@@ -245,7 +291,7 @@ class _ShoppingCartState extends State<ShoppingCartScreen> {
                                               context,
                                               MaterialPageRoute(
                                                   builder: (context) =>
-                                                      Address()),
+                                                      Address(),),
                                             );
                                           },
                                         ),
@@ -287,84 +333,9 @@ class _ShoppingCartState extends State<ShoppingCartScreen> {
                             ],
                           ),
                         ),
-                        Card(
-                          child: ListTile(
-                            leading: Text("Total Price",
-                                style: Theme.of(context).textTheme.subhead),
-                            trailing: Text(cart.totalPrice.toString() + "\$",
-                                style: Theme.of(context).textTheme.headline),
-                          ),
-                        ),
                         SizedBox(
                           height: 60,
-                        )
-
-//                        SizedBox(
-//                          width: double.infinity,
-//                          child: RaisedButton(
-//                            color: Colors.blueGrey,
-//                            child: Text(
-//                              "Order now!",
-//                              style: TextStyle(color: Colors.white70),
-//                            ),
-//                            onPressed: () async {
-//                              List<AddressModel> responseJson =
-//                                  await NetworkUtils.getAddress(_id);
-//
-//                              if (responseJson == null) {
-//                                showDialog(
-//                                    context: context,
-//                                    builder: (BuildContext context) {
-//                                      return AlertDialog(
-//                                        content: Text(
-//                                            "Address haven't added yet. Do you want to add your address now?"),
-//                                        actions: <Widget>[
-//                                          FlatButton(
-//                                            onPressed: () {
-//                                              Navigator.of(context).pop();
-//                                            },
-//                                            child: Text("No"),
-//                                          ),
-//                                          FlatButton(
-//                                            onPressed: () {
-//                                              Navigator.of(context).pop();
-//                                              Navigator.push(
-//                                                context,
-//                                                MaterialPageRoute(
-//                                                    builder: (context) =>
-//                                                        Address()),
-//                                              );
-//                                            },
-//                                            child: Text("Yes"),
-//                                          ),
-//                                        ],
-//                                      );
-//                                    });
-//                              } else if (responseJson.length > 0) {
-//                                ShoppingCart sendToOrder = snapshot.data;
-//                                print(
-//                                    "cart sending to order: ${sendToOrder.toMap()}");
-//                                Navigator.push(
-//                                  context,
-//                                  MaterialPageRoute(
-//                                      builder: (context) => OrderScreen(
-//                                            cart: sendToOrder,
-//                                            addressList: responseJson,
-//                                            cartID: cart.id,
-//                                          )),
-//                                );
-//                              }
-//
-////                          Scaffold.of(context).showSnackBar(
-////                              SnackBar(content: Text("Order completed!")));
-////                          Navigator.push(
-////                            context,
-////                            MaterialPageRoute(
-////                                builder: (context) => MainHomePage()),
-////                          );
-//                            },
-//                          ),
-//                        ),
+                        ),
                       ]),
                     ),
                     Positioned(
@@ -402,7 +373,7 @@ class _ShoppingCartState extends State<ShoppingCartScreen> {
                                                 context,
                                                 MaterialPageRoute(
                                                     builder: (context) =>
-                                                        Address()),
+                                                        Address(),),
                                               );
                                             },
                                             child: Text("Yes"),
@@ -412,7 +383,6 @@ class _ShoppingCartState extends State<ShoppingCartScreen> {
                                     });
                               } else if (responseJson.length > 0) {
                                 AddressModel address = responseJson[0];
-
                                 AssociationModel association =
                                     AssociationModel(orderRows: orderRowList);
                                 OrderModel newOrder = OrderModel(
@@ -445,7 +415,6 @@ class _ShoppingCartState extends State<ShoppingCartScreen> {
                                 var orderBody = {};
                                 orderBody["order"] = newOrder.orderMap();
                                 String strOrder = json.encode(orderBody);
-
                                 showDialog(
                                     context: context,
                                     builder: (BuildContext context) {
@@ -460,47 +429,50 @@ class _ShoppingCartState extends State<ShoppingCartScreen> {
                                           ),
                                           FlatButton(
                                             onPressed: () async {
-                                              print(strOrder);
-                                              OrderModel result = await NetworkUtils.createOrder(body: strOrder);
+                                              _showLoading();
+                                              _onLoading();
+                                              var result = await NetworkUtils.createOrder(body: strOrder);
+                                              if(result == "NetworkError"){
+                                                NetworkUtils.showSnackBar(_scaffoldKey, "Network Error");
+                                              }
+                                              else{
+                                                _hideLoading();
+                                                Navigator.pop(context);
+                                                BlocProvider.of<GlobalBloc>(context).shoppingCartBloc.clearCart();
+                                                ShoppingCart newCart = ShoppingCart(
+                                                    secureKey: _sharedPreferences.getString(AuthUtils.authTokenKey),
+                                                    idCurrency: "2",
+                                                    idCustomer: _sharedPreferences.getString(AuthUtils.userIdKey),
+                                                    idLanguage: "1",
+                                                    idShop: "1",
+                                                    idShopGroup: "1",
+                                                    idAddressDelivery: address.id,
+                                                    idAddressInvoice: address.id,
+                                                    idCarrier: "3");
+                                                var cartBody = {};
+                                                cartBody["carts"] = newCart.toMap();
+                                                String strCart = json.encode(cartBody);
+                                                ShoppingCart k = await NetworkUtils.createCart(body: strCart);
+                                                _sharedPreferences.setString(AuthUtils.cartIDKey, k.id);
+                                                List<OrderModel> orderList = await NetworkUtils.getLatestOrder();
+                                                OrderModel latestOrder = orderList[0];
+                                                OrderModel updateOder = newOrder;
+                                                updateOder.reference = latestOrder.reference;
+                                                updateOder.deliveryDate = latestOrder.deliveryDate;
+                                                updateOder.invoiceDate = latestOrder.invoiceDate;
+                                                updateOder.id = latestOrder.id;
+                                                updateOder.deliveryNumber = latestOrder.deliveryNumber;
+                                                updateOder.invoiceNumber = latestOrder.invoiceNumber;
+                                                var updateOrderBody = {};
+                                                updateOrderBody["order"] = updateOder.updateOrderMap();
+                                                String updateStrOrder = json.encode(updateOrderBody);
+                                                await NetworkUtils.updateOrder(body: updateStrOrder);
+                                                Navigator.pop(context);
+                                                setState(() {
+                                                  streamCart = BlocProvider.of<GlobalBloc>(context).shoppingCartBloc.cartStream;
 
-                                              BlocProvider.of<GlobalBloc>(context).shoppingCartBloc.clearCart();
-                                              ShoppingCart newCart = ShoppingCart(
-                                                  secureKey: _sharedPreferences.getString(AuthUtils.authTokenKey),
-                                                  idCurrency: "2",
-                                                  idCustomer: _sharedPreferences.getString(AuthUtils.userIdKey),
-                                                  idLanguage: "1",
-                                                  idShop: "1",
-                                                  idShopGroup: "1",
-                                                  idAddressDelivery: address.id,
-                                                  idAddressInvoice: address.id,
-                                                  idCarrier: "3");
-                                              var cartBody = {};
-                                              cartBody["carts"] = newCart.toMap();
-                                              String strCart = json.encode(cartBody);
-                                              ShoppingCart k = await NetworkUtils.createCart(body: strCart);
-                                              print(k.toMap());
-                                              _sharedPreferences.setString(AuthUtils.cartIDKey, k.id);
-                                              print(_sharedPreferences.getString(AuthUtils.cartIDKey));
-                                              List<OrderModel> orderList = await NetworkUtils.getLatestOrder();
-                                              OrderModel latestOrder = orderList[0];
-                                              OrderModel updateOder = newOrder;
-                                              updateOder.reference = latestOrder.reference;
-                                              updateOder.deliveryDate = latestOrder.deliveryDate;
-                                              updateOder.invoiceDate = latestOrder.invoiceDate;
-                                              updateOder.id = latestOrder.id;
-                                              updateOder.deliveryNumber = latestOrder.deliveryNumber;
-                                              updateOder.invoiceNumber = latestOrder.invoiceNumber;
-
-                                              var updateOrderBody = {};
-                                              updateOrderBody["order"] = updateOder.updateOrderMap();
-                                              String updateStrOrder = json.encode(updateOrderBody);
-                                              print(updateStrOrder);
-                                              await NetworkUtils.updateOrder(body: updateStrOrder);
-                                              Navigator.pop(context);
-                                              setState(() {
-                                                streamCart = BlocProvider.of<GlobalBloc>(context).shoppingCartBloc.cartStream;
-
-                                              });
+                                                });
+                                              }
                                             },
                                             child: Text("Yes !"),
                                           ),
@@ -527,16 +499,13 @@ class _ShoppingCartState extends State<ShoppingCartScreen> {
           }),
     );
   }
-
   getAddress(String id) async {
     return await NetworkUtils.getAddress(id);
   }
-
   List<Widget> getProductTiles() {
     List<Widget> list = [];
     if (cart != null) {
       for (ProductModel p in cart.products) {
-        print("my new cart: ${cart.products.length}");
         OrderRow orderRow = OrderRow(
             productId: p.id,
             productName: p.name,

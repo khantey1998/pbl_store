@@ -62,7 +62,10 @@ class ShoppingCart {
       var cartBody = {};
       cartBody["carts"] = cart.toMap();
       String strCart = json.encode(cartBody);
-      await NetworkUtils.updateCart(body: strCart);
+      var result = await NetworkUtils.updateCart(body: strCart);
+      if(result == "success"){
+
+      }
     }
   }
 

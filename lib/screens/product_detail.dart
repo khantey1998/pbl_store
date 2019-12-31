@@ -269,7 +269,6 @@ class _ProductDetailPageState extends State<ProductDetailPage>
     var res = await http.get(
         '$baseUrl/stock_availables/${widget.product.associations.stockAvailable[0].id}');
     if (res.statusCode == 200) {
-      print("my stock result" + res.body);
 
       final response = json.decode(res.body)['stock_available'];
       return StockAvailableModel.fromJson(response);
@@ -278,7 +277,6 @@ class _ProductDetailPageState extends State<ProductDetailPage>
   }
 
   _buildShortDescriptionWidgets() {
-    print("${widget.product.description}");
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12.0),
       child: widget.product.shortDescription.isEmpty
@@ -322,15 +320,19 @@ class _ProductDetailPageState extends State<ProductDetailPage>
             height: MediaQuery.of(context).size.height * 0.4,
             child: TabBarView(
               controller: tabController,
+
               children: <Widget>[
-                Html(
-                  data: """${widget.product.description}""",
-                ),
-                Center(
-                  child: Text(
-                    "No Review For This Product Yet!",
+                SingleChildScrollView(
+                  child: Html(
+                    data: """${widget.product.description}""",
                   ),
-                )
+                ),
+                SingleChildScrollView(
+                  child: Center(
+                    child: Text("No Reviews For This product yet"),
+                  ),
+                ),
+
               ],
             ),
           ),
@@ -367,7 +369,7 @@ class _ProductDetailPageState extends State<ProductDetailPage>
     );
   }
 
-  Future<List<ProductModel>> _getRelatedProducts() async {
+  _getRelatedProducts() async {
     List<ProductModel> relatedProductList = List();
     if (widget.product.associations.relatedProducts.length > 0) {
       for (int i = 0;
@@ -376,8 +378,6 @@ class _ProductDetailPageState extends State<ProductDetailPage>
         var res = await http.get(
             '$baseUrl/products/${widget.product.associations.relatedProducts[i].id}');
         if (res.statusCode == 200) {
-          print("my related product result" + res.body);
-
           final response = json.decode(res.body)['product'];
           ProductModel relatedProduct = ProductModel.fromJson(response);
           relatedProductList.add(relatedProduct);
@@ -386,7 +386,6 @@ class _ProductDetailPageState extends State<ProductDetailPage>
     }
     return relatedProductList;
   }
-
   _buildRelatedProducts() {
     return FutureBuilder(
       future: _getRelatedProducts(),
@@ -621,7 +620,6 @@ class _ProductDetailPageState extends State<ProductDetailPage>
 
                               _n = 1;
                               Navigator.of(context).pop();
-
                             },
                             child: Text("Add"),
                           ),
