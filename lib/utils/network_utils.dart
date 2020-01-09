@@ -390,4 +390,26 @@ class NetworkUtils {
 			}
 		}
 	}
+	static dynamic getOrders(String id) async {
+		var url = Uri.http(host, "/api/orders", {'display': 'full', " filter[id_customer]":id});
+		try {
+			final response = await http.get(
+					url,
+					headers: {
+						'Content-Type': 'application/json; charset=utf-8',
+					}
+			);
+			final responseJson = (json.decode(response.body)['orders'] as List)
+					.map((data) => OrderModel.fromJson(data))
+					.toList();
+			return responseJson;
+		} catch (exception) {
+			if (exception.toString().contains('SocketException')) {
+				return 'NetworkError';
+			} else {
+				return null;
+			}
+		}
+	}
+
 }

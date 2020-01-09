@@ -65,6 +65,7 @@ import 'package:pbl_store/bloc/BlocProvider.dart';
 import 'package:pbl_store/bloc/GlobalBloc.dart';
 import 'package:pbl_store/screens/login.dart';
 import 'package:pbl_store/models/order_model.dart';
+import 'package:pbl_store/screens/order_list.dart';
 
 class AccountScreen extends StatefulWidget {
   @override
@@ -158,14 +159,23 @@ class _AccountScreenState extends State<AccountScreen> {
             SizedBox(
               height: 10.0,
             ),
-            Card(
-              borderOnForeground: true,
-              margin: const EdgeInsets.all(0.5),
-              child: ListTile(
-                leading: Icon(Icons.playlist_play),
-                title: Text('My Order'),
-                trailing: Text("View All"),
+            GestureDetector(
+              child: Card(
+                borderOnForeground: true,
+                margin: const EdgeInsets.all(0.5),
+                child: ListTile(
+                  leading: Icon(Icons.playlist_play),
+                  title: Text('My Order'),
+                  trailing: Text("View All"),
+                ),
               ),
+              onTap: (){
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => ListOrder()),
+                );
+              },
             ),
             Card(
               margin: const EdgeInsets.all(0.5),
