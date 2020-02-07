@@ -29,13 +29,15 @@ class OrderModel{
   String conversionRate;
   String reference;
   String deliveryNumber;
+  String dateAdded;
   AssociationModel association;
+  String status;
 
 
   OrderModel({this.idAddressDelivery, this.idAddressInvoice, this.idCart,this.deliveryNumber,
     this.idCurrency, this.idLang, this.idCustomer, this.idCarrier, this.id,
-    this.currentState, this.module, this.invoiceNumber, this.valid,
-    this.idShopGroup, this.idShop, this.secureKey, this.payment,
+    this.currentState, this.module, this.invoiceNumber, this.valid, this.status,
+    this.idShopGroup, this.idShop, this.secureKey, this.payment, this.dateAdded,
     this.totalPaid, this.totalPaidTaxIncl, this.totalPaidTaxExcl, this.invoiceDate,
     this.totalPaidReal, this.totalProducts, this.totalProductWt, this.deliveryDate,
     this.roundMode, this.roundType, this.conversionRate, this.reference,
@@ -43,6 +45,7 @@ class OrderModel{
 
   factory OrderModel.fromJson(Map<String, dynamic> json){
     return OrderModel(
+      dateAdded: json["date_add"],
       invoiceDate: json["invoice_date"],
       deliveryDate: json["delivery_date"],
       idAddressDelivery: json["id_address_delivery"],

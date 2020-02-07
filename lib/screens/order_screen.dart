@@ -44,12 +44,7 @@ class _OrderScreenState extends State<OrderScreen> {
   }
 
   Widget body() {
-    for (AddressModel a in widget.addressList) {
-      print("address: ${a.toMap()}");
-      print(widget.addressList.length);
-    }
     AddressModel address = widget.addressList[0];
-
     AssociationModel association = AssociationModel(orderRows: orderRowList);
     OrderModel newOrder = OrderModel(
       idCart: widget.cartID,
@@ -79,8 +74,6 @@ class _OrderScreenState extends State<OrderScreen> {
     );
     var orderBody = {};
     orderBody["order"] = newOrder.orderMap();
-    String strOrder = json.encode(orderBody);
-    print(strOrder);
 
     return SingleChildScrollView(
       child: Column(
@@ -172,7 +165,6 @@ class _OrderScreenState extends State<OrderScreen> {
   List<Widget> getProductTiles() {
     List<Widget> list = [];
     if (_cart != null) {
-      print("order cart: ${_cart.toMap()}");
       for (ProductModel p in _cart.products) {
         OrderRow orderRow = OrderRow(
             productId: p.id,

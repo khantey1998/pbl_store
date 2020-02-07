@@ -42,8 +42,8 @@ class _HomeScreenState extends State<HomeScreen> {
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           if (snapshot.hasData) {
             productList = snapshot.data;
-            print("all products: ${productList.length}");
             for (ProductModel i in productList) {
+              print(i.associations.categories.length);
               for (var j in i.associations.categories) {
                 if (j.id == "4") {
                   powerToolList.add(i);
@@ -623,7 +623,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             );
           } else {
-            print(snapshot.data);
             return Container(
                 padding: EdgeInsets.all(50),
                 child: Center(

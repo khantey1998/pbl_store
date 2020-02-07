@@ -1,3 +1,4 @@
+import 'package:pbl_store/models/association_model.dart';
 class ManufacturerModel{
   String id;
   String name;

@@ -73,13 +73,7 @@ class _RegisterState extends State<Register>{
       );
       resBody["customer"] = newCustomer.toMap();
       String str = json.encode(resBody);
-      print(str);
-
-
-
       var responseJson = await NetworkUtils.checkExistingEmail(_emailController.text.toString());
-
-
       if(responseJson == null) {
         var registerRes = await NetworkUtils.registerUser(body: str);
         _sharedPreferences = await _prefs;
@@ -100,17 +94,14 @@ class _RegisterState extends State<Register>{
           String strCart = json.encode(cartBody);
           var k = await NetworkUtils.createCart(body: strCart);
           AuthUtils.insertDetails(_sharedPreferences, responseJson, k);
-          print(k);
           Navigator.pushReplacement(_scaffoldKey.currentContext, MaterialPageRoute(builder: (context)=> MainHomePage()));
         }
         else{
-          print(registerRes);
           NetworkUtils.showSnackBar(_scaffoldKey, 'Error Signing Up, Try again');
         }
       } else if(responseJson == 'NetworkError') {
         NetworkUtils.showSnackBar(_scaffoldKey, 'NetworkError');
       } else {
-        //NetworkUtils.showSnackBar(_scaffoldKey, '');
         _emailError = "Email already Exist!";
       }
       _hideLoading();

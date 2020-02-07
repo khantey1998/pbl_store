@@ -55,7 +55,7 @@
 //    );
 //  }
 //}
-
+import 'package:pbl_store/models/category_model.dart';
 import 'package:flutter/material.dart';
 import 'package:pbl_store/utils/network_utils.dart';
 import 'package:pbl_store/utils/auth_utils.dart';
@@ -66,6 +66,9 @@ import 'package:pbl_store/bloc/GlobalBloc.dart';
 import 'package:pbl_store/screens/login.dart';
 import 'package:pbl_store/models/order_model.dart';
 import 'package:pbl_store/screens/order_list.dart';
+import 'package:pbl_store/screens/personal_data.dart';
+import 'package:pbl_store/screens/address_list.dart';
+import 'dart:convert';
 
 class AccountScreen extends StatefulWidget {
   @override
@@ -113,159 +116,221 @@ class _AccountScreenState extends State<AccountScreen> {
 
     return Scaffold(
         key: _scaffoldKey,
-        body: ListView(
-          padding: const EdgeInsets.all(8),
-          scrollDirection: Axis.vertical,
-          children: <Widget>[
-            Card(
-              elevation: 3,
-              margin: const EdgeInsets.all(5.0),
-              shape: new RoundedRectangleBorder(
-                borderRadius: new BorderRadius.circular(100 / 2),
-              ) +
-                  Border.all(color: Colors.white),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Container(
-                    padding: EdgeInsets.all(10.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: <Widget>[
-                        Icon(
-                          Icons.favorite_border,
-                          color: Colors.black,
-                        ),
-                        Text("Wish List"),
-                      ],
+        body: Container(
+          color: Color(0xfc0c0c0),
+          child: ListView(
+            scrollDirection: Axis.vertical,
+            children: <Widget>[
+//              Card(
+//                child: Row(
+//                  children: [
+//                    Container(
+//                      padding: EdgeInsets.all(20.0),
+//                      child: Column(
+//                        crossAxisAlignment: CrossAxisAlignment.center,
+//                        children: <Widget>[
+//
+//
+//                        ],
+//                      ),
+//                    ),
+////                  Container(
+////                    padding: EdgeInsets.all(10.0),
+////                    child: Column(
+////                      crossAxisAlignment: CrossAxisAlignment.center,
+////                      children: <Widget>[
+////                        Icon(
+////                          Icons.favorite_border,
+////                          color: Colors.black,
+////                        ),
+////                        Text("Wish List"),
+////                      ],
+////                    ),
+////                  ),
+////                  Container(
+////                    padding: EdgeInsets.all(10.0),
+////                    child: Column(
+////                      crossAxisAlignment: CrossAxisAlignment.center,
+////                      children: <Widget>[
+////                        Icon(
+////                          Icons.star_border,
+////                          color: Colors.black,
+////                        ),
+////                        Text("Following")
+////                      ],
+////                    ),
+////                  ),
+//                  ],
+//                ),
+//              ),
+              Container(
+                padding: EdgeInsets.only(left: 30, top: 20, bottom: 20),
+                child: Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: Text("$_name ", style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),),
+                      flex: 2,
                     ),
-                  ),
-                  Container(
-                    padding: EdgeInsets.all(10.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: <Widget>[
-                        Icon(
-                          Icons.star_border,
-                          color: Colors.black,
-                        ),
-                        Text("Following")
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(
-              height: 10.0,
-            ),
-            GestureDetector(
-              child: Card(
-                borderOnForeground: true,
-                margin: const EdgeInsets.all(0.5),
-                child: ListTile(
-                  leading: Icon(Icons.playlist_play),
-                  title: Text('My Order'),
-                  trailing: Text("View All"),
+                    Expanded(
+                      flex: 1,
+                      child: CircleAvatar(
+                        backgroundColor: Colors.deepOrangeAccent,
+                        radius: 30,
+                        child: Text("$_name".substring(0,2).toUpperCase(), style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.white),),
+                      ),
+                    )
+                  ],
                 ),
               ),
-              onTap: (){
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => ListOrder()),
-                );
-              },
-            ),
-            Card(
-              margin: const EdgeInsets.all(0.5),
-              borderOnForeground: true,
-              child: ListTile(
-                title: Text('Unpaid'),
-              ),
-            ),
-            Card(
-              margin: const EdgeInsets.all(0.5),
-              borderOnForeground: true,
-              child: ListTile(
-                title: Text('To Be Shipped'),
-              ),
-            ),
-            Card(
-              margin: const EdgeInsets.all(0.5),
-              borderOnForeground: true,
-              child: ListTile(
-                title: Text('Shipped'),
-              ),
-            ),
-            SizedBox(
-              height: 20.0,
-            ),
-            Card(
-              elevation: 5,
-              margin: const EdgeInsets.all(0.8),
-              borderOnForeground: true,
-              child: GestureDetector(
-                onTap: ()async{
-                  List<OrderModel> order = await NetworkUtils.getLatestOrder();
-                  print(order[0].updateOrderMap());
+              GestureDetector(
+                child: Card(
+                  margin: const EdgeInsets.all(0.5),
+                  child: ListTile(
+                    leading: Icon(Icons.playlist_play),
+                    title: Text('My Order'),
+                    trailing: Text("View All"),
+                  ),
+                ),
+                onTap: (){
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => ListOrder()),
+                  );
                 },
+              ),
+              SizedBox(
+                height: 15.0,
+              ),
+              Card(
+                margin: const EdgeInsets.all(0.0),
                 child: ListTile(
+                  onTap: ()async{
+                    List<OrderModel> order = await NetworkUtils.getLatestOrder();},
                   leading: Icon(Icons.settings),
                   title: Text('Setting'),
-                  trailing: Icon(Icons.flag),
+                  trailing: Icon(Icons.arrow_forward_ios),
                 ),
+
+              ),
+              Card(
+                margin: const EdgeInsets.all(0.0),
+                child: ListTile(
+                  onTap: (){
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => Data()),
+                    );
+                  },
+                  leading: Icon(Icons.person),
+                  title: Text('Personal Information'),
+                  trailing: Icon(Icons.arrow_forward_ios),
+                ),
+              ),
+              Card(
+                margin: const EdgeInsets.all(0.0),
+                child: ListTile(
+                  leading: Icon(Icons.pin_drop),
+                  title: Text('Addresses'),
+                  trailing: Icon(Icons.arrow_forward_ios),
+                  onTap: (){
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => AddressList()),
+                    );
+                  },
+                ),
+              ),
+              SizedBox(
+                height: 15.0,
+              ),
+
+              Card(
+                margin: const EdgeInsets.all(0.0),
+                child: ListTile(
+                  onTap: (){
+                  },
+                  leading: Icon(Icons.headset_mic),
+                  title: Text('Help Center'),
+                  trailing: Icon(Icons.arrow_forward_ios),
+                ),
+              ),
+              Card(
+                margin: const EdgeInsets.all(0.0),
+                child: ListTile(
+                  leading: Icon(Icons.wb_incandescent),
+                  title: Text('About Us'),
+                  trailing: Icon(Icons.arrow_forward_ios),
+                ),
+              ),
+              Card(
+                margin: const EdgeInsets.all(0.0),
+                child: ListTile(
+
+                onTap: ()async{
+                 var re = await NetworkUtils.getAllCategories();
+//                 print(re);
+//                 final responseJson = (json.decode(re)["categories"] as List)
+//                        .map((data) => CategoryModel.fromJson(data))
+//                        .toList();
+
+                    print(re);
+
+                  },
+                  leading: Icon(Icons.contact_phone),
+                  title: Text('Contact Us'),
+                  trailing: Icon(Icons.arrow_forward_ios),
+                ),
+              ),
+
+              Container(
+                height: 65,
+                padding: EdgeInsets.only(top: 15, left: 25, right: 25),
+                child: RaisedButton(
+                  color: Colors.red,
+                  child: Text("Sign Out", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
+                  onPressed: (){
+                    showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: Text(
+                              "Log Out?",
+                              style: TextStyle(fontSize: 16),
+                            ),
+                            content: Text("Are you sure you want to log out?"),
+                            actions: <Widget>[
+                              FlatButton(
+                                onPressed: () {
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => LoginPage()),
+                                  );
+                                },
+                                child: Text("Cancel"),
+                              ),
+                              FlatButton(
+                                onPressed: _logout,
+                                child: Text("Log Out"),
+                              ),
+                            ],
+                          );
+                        });
+                  },
+                ),
+
+              ),
+              SizedBox(
+                height: 15,
               )
-            ),
-            Card(
-              margin: const EdgeInsets.all(0.0),
-              borderOnForeground: true,
-              child: ListTile(
-                leading: Icon(Icons.help_outline),
-                title: Text('Help Center'),
-              ),
-            ),
 
-            Card(
-              margin: const EdgeInsets.all(0.0),
-              borderOnForeground: true,
-              child: ListTile(
-                onTap: (){
-                  showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: Text(
-                            "Log Out?",
-                            style: TextStyle(fontSize: 16),
-                          ),
-                          content: Text("Are you sure you want to log out?"),
-                          actions: <Widget>[
-                            FlatButton(
-                              onPressed: () {
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => LoginPage()),
-                                );
-                              },
-                              child: Text("Cancel"),
-                            ),
-                            FlatButton(
-                              onPressed: _logout,
-                              child: Text("Log Out"),
-                            ),
-                          ],
-                        );
-                      });
-                },
-                leading: Icon(Icons.exit_to_app),
-                title: Text('Log Out'),
-              ),
-            ),
-
-          ],
-        ));
+            ],
+          ),
+        ),
+    );
   }
 }
 

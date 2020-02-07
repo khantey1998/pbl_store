@@ -94,7 +94,7 @@ class _AddressState extends State<Address> {
       var a = await NetworkUtils.createAddress(body: strAddress);
 
       if(a!=null){
-        print("$a success");
+
         NetworkUtils.showSnackBar(_scaffoldKey, "New Address Added!");
         Navigator.pop(context);
         _hideLoading();
@@ -174,14 +174,12 @@ class _AddressState extends State<Address> {
             icon: Icon(
               choices[0].icon,
               size: 25.0,
-              color: Colors.grey,
+              color: Colors.black,
             ),
             onPressed: () {
-              _select(choices[0]);
+              Navigator.pop(context);
             },
-
           ),
-
         ),
         body: _isLoading? _loadingScreen() :  ListView(
           scrollDirection: Axis.vertical,

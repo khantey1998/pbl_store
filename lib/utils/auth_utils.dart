@@ -20,7 +20,7 @@ class AuthUtils {
 	static insertDetails(SharedPreferences prefs, List<Customer> response, ShoppingCart cart) {
 		prefs.setString(authTokenKey, response[0].securityKey);
 		prefs.setString(userIdKey, response[0].id);
-		prefs.setString(nameKey, response[0].firstName);
+		prefs.setString(nameKey, response[0].firstName+" "+response[0].lastName);
 		prefs.setString(emailKey, response[0].email);
 		prefs.setString(cartIDKey, cart.id);
 	}

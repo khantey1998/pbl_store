@@ -13,7 +13,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pbl_store/utils/auth_utils.dart';
 import 'package:pbl_store/screens/shoppingcart_screen.dart';
 import 'package:flutter_html/flutter_html.dart';
-
+import 'package:pbl_store/utils/network_utils.dart';
 
 class ProductDetailPage extends StatefulWidget {
   final ProductModel product;
@@ -375,13 +375,8 @@ class _ProductDetailPageState extends State<ProductDetailPage>
       for (int i = 0;
           i < widget.product.associations.relatedProducts.length;
           i++) {
-        var res = await http.get(
-            '$baseUrl/products/${widget.product.associations.relatedProducts[i].id}');
-        if (res.statusCode == 200) {
-          final response = json.decode(res.body)['product'];
-          ProductModel relatedProduct = ProductModel.fromJson(response);
-          relatedProductList.add(relatedProduct);
-        }
+        var res = await NetworkUtils.getSingleProduct(widget.product.associations.relatedProducts[i].id);
+        relatedProductList.add(res);
       }
     }
     return relatedProductList;

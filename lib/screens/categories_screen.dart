@@ -10,7 +10,7 @@ class CategoryScreen extends StatefulWidget {
 }
 
 class CategoryState extends State<CategoryScreen> {
-  List<CategoryModel> categories;
+  List<CategoryModel> categories = List();
   @override
   void initState() {
     super.initState();
@@ -23,10 +23,7 @@ class CategoryState extends State<CategoryScreen> {
           color: Colors.black, //change your color here
         ),
         backgroundColor: Colors.white,
-        title: Image.asset(
-          "assets/logo.jpg",
-          width: 200,
-        ),
+        title: Text("All Categories", style: TextStyle(color: Colors.black),),
         actions: <Widget>[
           IconButton(
             icon: Icon(
@@ -45,7 +42,6 @@ class CategoryState extends State<CategoryScreen> {
             var cats = categories
                 .where((cat) => cat.id != "2" && cat.id != "1")
                 .toList();
-            print(cats.length);
             return ListView.separated(
               separatorBuilder: (context, index) => Divider(
                     color: Colors.grey,

@@ -33,20 +33,12 @@ class _HomePageState extends State<MainHomePage>{
     String authToken = AuthUtils.getToken(_sharedPreferences);
     var id = _sharedPreferences.getString(AuthUtils.userIdKey);
     var name = _sharedPreferences.getString(AuthUtils.nameKey);
-
-    print("authtoken: $authToken");
-
-//    _fetchProfile(authToken);
-
     setState(() {
       _authToken = authToken;
       _id = id;
       _name = name;
     });
-
-
   }
-
   void onNavItemsTapped(int index) {
     setState(() {
       _currentIndex = index;
@@ -68,7 +60,7 @@ class _HomePageState extends State<MainHomePage>{
         backgroundColor: Colors.white,
 
         title:
-            Image.asset("assets/logo.jpg", width: 200,),
+            Image.asset("assets/logo1.png", width: 70,),
         actions: <Widget>[
 //          IconButton(
 //            icon: Icon(Icons.shopping_cart, color: Color(0xff333366),),

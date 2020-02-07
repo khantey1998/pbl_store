@@ -13,7 +13,8 @@ class ProductModel{
   int amount = 0;
 
 
-  ProductModel({this.amount, this.id, this.name, this.idDefaultImage, this.price, this.associations, this.idCategoryDefault, this.description, this.shortDescription});
+  ProductModel({this.amount, this.id, this.name, this.idDefaultImage, this.price,
+    this.associations, this.idCategoryDefault, this.description, this.shortDescription});
   factory ProductModel.fromJson(Map<String, dynamic> parsedJson) {
 
 

@@ -1,4 +1,4 @@
-import 'package:pbl_store/models/category_model.dart';
+import 'package:pbl_store/models/cat_id.dart';
 import 'package:pbl_store/models/stock_available_model.dart';
 import 'package:pbl_store/models/image_model.dart';
 import 'package:pbl_store/models/accessory_model.dart';
@@ -9,13 +9,15 @@ import 'package:pbl_store/models/cart_rows.dart';
 class AssociationModel{
   List<ImageModel> images;
   List<StockAvailableModel> stockAvailable;
-  List<CategoryModel> categories;
+  List<CategoryID> categories;
   List<AccessoriesModel> relatedProducts;
   List<Group> group;
   List<CartRow> cartRows;
   List<OrderRow> orderRows;
 
-  AssociationModel({this.orderRows, this.images, this.stockAvailable, this.categories, this.relatedProducts, this.group, this.cartRows});
+
+  AssociationModel({this.orderRows, this.images, this.stockAvailable, this.categories,
+    this.relatedProducts, this.group, this.cartRows});
 
   factory AssociationModel.fromJson(Map<String, dynamic> parsedJson) {
     var imageListRaw = parsedJson['images'];
@@ -30,9 +32,10 @@ class AssociationModel{
     List<Group> groupList = List();
     List<AccessoriesModel> relatedProductList = List();
 
+
     List<ImageModel> imageList = List();
     List<StockAvailableModel> stockList = List();
-    List<CategoryModel> categoryList = List();
+    List<CategoryID> categoryList = List();
     List<OrderRow> orderRowList = List();
 
     if(orderRow !=null){
@@ -41,6 +44,7 @@ class AssociationModel{
     if(relatedProduct != null){
       relatedProductList = List<AccessoriesModel>.from(relatedProduct.map<AccessoriesModel>((i) => AccessoriesModel.fromJson(i)));
     }
+
     if(cart != null){
       cartRowList = List<CartRow>.from(cart.map<CartRow>((i) => CartRow.fromJson(i)));
     }
@@ -54,7 +58,7 @@ class AssociationModel{
       stockList = List<StockAvailableModel>.from(stockListRaw.map<StockAvailableModel>((i) => StockAvailableModel.fromJson(i)));
     }
     if(categoryListRaw != null){
-      categoryList = List<CategoryModel>.from(categoryListRaw.map<CategoryModel>((i) => CategoryModel.fromJson(i)));
+      categoryList = List<CategoryID>.from(categoryListRaw.map<CategoryID>((i) => CategoryID.fromJson(i)));
     }
     return AssociationModel(
       cartRows: cartRowList,
@@ -63,7 +67,7 @@ class AssociationModel{
       stockAvailable: stockList,
       categories: categoryList,
       relatedProducts: relatedProductList,
-      orderRows: orderRowList
+      orderRows: orderRowList,
     );
   }
   Map groupMap(){

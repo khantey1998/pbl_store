@@ -3,6 +3,9 @@ import 'package:pbl_store/utils/network_utils.dart';
 import 'package:pbl_store/models/order_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pbl_store/utils/auth_utils.dart';
+import 'package:pbl_store/models/order_status.dart';
+import 'package:pbl_store/utils/other_utils.dart';
+import 'package:pbl_store/screens/view_order_details.dart';
 
 
 // This app is a stateful, it tracks the user's current choice.
@@ -39,6 +42,9 @@ class _ListOrderState extends State<ListOrder> {
   }
   _getOrders(String id)async{
     return await NetworkUtils.getOrders(id);
+  }
+  _getStatus(String idOrder)async{
+    return await NetworkUtils.getAllOrderStatus(idOrder);
   }
 
   @override
@@ -88,32 +94,138 @@ class _ListOrderState extends State<ListOrder> {
               color: Colors.black,
             ),
           ),
+          leading: GestureDetector(
+            child: Icon(Icons.arrow_back, color: Colors.black,),
+            onTap: (){
+              Navigator.pop(context);
+            },
+          ),
           actions: <Widget>[
             // action button
-            IconButton(
-              icon: Icon(choices[1].icon),
-              color: Colors.grey,
-              onPressed: () {
-                _select(choices[1]);
-              },
-            ),
-
           ],
 
         ),
         body: FutureBuilder(
           future: _getOrders(_id),
           builder: (BuildContext context, AsyncSnapshot snapshot){
-            if(snapshot.hasData){
-              print(snapshot.data);
-              List<OrderModel> orderList = snapshot.data;
-              print(orderList[0].reference);
+            if(snapshot.hasData){List<OrderModel> orderList = snapshot.data;
               return ListView.builder(
                 itemCount: orderList.length,
                 scrollDirection: Axis.vertical,
                 itemBuilder: (BuildContext context, int index){
+
                   return Container(
-                    child: Text("${orderList[index].reference}"),
+                    child: Column(
+                      children: <Widget>[
+                        FutureBuilder(
+                          future: _getStatus(orderList[index].id),
+                          builder: (BuildContext context, AsyncSnapshot snapshot){
+                            if(snapshot.hasData){
+                              List<OrderStatus> orderStatus = snapshot.data;
+                              return GestureDetector(
+                                onTap: (){
+                                  Navigator.push(context,
+                                    MaterialPageRoute(builder: (context)=>ViewOrderDetail(order: orderList[index]))
+                                  );
+                                },
+                                child:Card(
+                                  child: Column(
+                                    children: <Widget>[
+                                      Row(
+                                        children: <Widget>[
+                                          Expanded(
+                                            flex: 1,
+                                            child: new Container(
+                                              margin:
+                                              const EdgeInsets.only(left: 10.0, right: 20.0),
+                                              child: Text("Reference: "),
+                                            ),
+                                          ),
+                                          Expanded(
+                                            flex: 2,
+                                            child: new Container(
+                                              margin:
+                                              const EdgeInsets.only(left: 20.0, right: 10.0),
+                                              child: Text(orderList[index].reference, style: TextStyle(fontSize: 16, color: Color(0xff000080), fontWeight: FontWeight.bold),),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      Row(
+                                        children: <Widget>[
+                                          Expanded(
+                                            flex: 1,
+                                            child: new Container(
+                                              margin:
+                                              const EdgeInsets.only(left: 10.0, right: 20.0),
+                                              child: Text("Date Order: "),
+                                            ),
+                                          ),
+                                          Expanded(
+                                            flex: 2,
+                                            child: new Container(
+                                              margin:
+                                              const EdgeInsets.only(left: 20.0, right: 10.0),
+                                              child: Text(orderList[index].dateAdded.split(' ')[0], style: TextStyle(fontSize: 16, color: Color(0xff000080), fontWeight: FontWeight.bold),),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      Row(
+                                        children: <Widget>[
+                                          Expanded(
+                                            flex: 1,
+                                            child: new Container(
+                                              margin:
+                                              const EdgeInsets.only(left: 10.0, right: 20.0),
+                                              child: Text("Total Price: "),
+                                            ),
+                                          ),
+                                          Expanded(
+                                            flex: 2,
+                                            child: new Container(
+                                              margin:
+                                              const EdgeInsets.only(left: 20.0, right: 10.0),
+                                              child: Text("\$${double.parse(orderList[index].totalPaidReal)}", style: TextStyle(fontSize: 16, color: Color(0xff000080), fontWeight: FontWeight.bold),),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(height: 6,),
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.end,
+                                        children: <Widget>[
+                                          Expanded(
+                                            flex: 2,
+                                            child: new Container(
+
+                                              child: RaisedButton(
+                                                color:OtherUtils.hexToColor(orderStatus.first.color),
+                                                onPressed: (){
+                                                  Navigator.push(context,
+                                                      MaterialPageRoute(builder: (context)=>ViewOrderDetail(order: orderList[index])));
+                                                  },
+                                                child: Text("${orderStatus.first.status}".toUpperCase(), style: TextStyle(color: Colors.white, fontSize: 16),),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            }
+                            else{
+                              return Padding(
+                                padding: EdgeInsets.all(40),
+                                child: CircularProgressIndicator(),
+                              );
+                            }
+                          },
+                        )
+                      ],
+                    )
                   );
                 },
               );

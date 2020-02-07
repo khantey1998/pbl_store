@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'package:pbl_store/models/manufacturer_model.dart';
 import 'package:pbl_store/utils/network_utils.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class ManufacturerScreen extends StatefulWidget {
 
@@ -14,7 +13,7 @@ class ManufacturerScreen extends StatefulWidget {
 
 class ManufacturerState extends State<ManufacturerScreen>{
   List<ManufacturerModel> manufacturers;
-
+  String baseUrl = "http://3Q49Q5T8GNBFV7MPR7HG9FT4EP92Q4ZB@pblstore.com/api";
   @override
   void initState() {
     super.initState();
@@ -30,7 +29,7 @@ class ManufacturerState extends State<ManufacturerScreen>{
         ),
         backgroundColor: Colors.white,
         title:
-        Image.asset("assets/logo.jpg", width: 200,),
+        Text("All Brands", style: TextStyle(color: Colors.black),),
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.search, color: Color(0xff333366),),
@@ -54,10 +53,17 @@ class ManufacturerState extends State<ManufacturerScreen>{
               itemBuilder: (context, index){
                 return ListTile(
                   title: Text(manufacturers[index].name),
+                  leading: CachedNetworkImage(
+                    imageUrl:
+                    '$baseUrl/images/manufacturers/${manufacturers[index].id}',
+                    placeholder: (context, url) =>
+                        Image.asset('assets/p.png'),
+                    fit: BoxFit.fitHeight,
+                    width: 70,
+                  ),
                 );
               },
             );
-
           }
           else {
             return Center(
@@ -66,7 +72,6 @@ class ManufacturerState extends State<ManufacturerScreen>{
           }
         },
       ),
-
     );
   }
 }

@@ -129,10 +129,7 @@ class LoginPageState extends State<LoginPage> {
   _fetchSessionAndNavigate() async {
     _sharedPreferences = await _prefs;
     String authToken = AuthUtils.getToken(_sharedPreferences);
-    print(authToken);
     if(authToken != null) {
-//      Navigator.of(_scaffoldKey.currentContext)
-//          .pushReplacementNamed(HomePage.routeName);
       Navigator.pushReplacement(_scaffoldKey.currentContext, MaterialPageRoute(builder: (context)=> MainHomePage()));
     }
   }
@@ -153,9 +150,6 @@ class LoginPageState extends State<LoginPage> {
     _showLoading();
     if(_valid()) {
       var responseJson = await NetworkUtils.verifyPassword(_emailController.text, _passwordController.text);
-
-      print(responseJson);
-
       if(responseJson == null) {
         NetworkUtils.showSnackBar(_scaffoldKey, 'Incorrect Email or Password!');
       } else if(responseJson == false) {
@@ -179,7 +173,6 @@ class LoginPageState extends State<LoginPage> {
         cartBody["carts"] = newCart.toMap();
         String strCart = json.encode(cartBody);
         var k = await NetworkUtils.createCart(body: strCart);
-        print(k);
         AuthUtils.insertDetails(_sharedPreferences, responseJson, k);
 
 
