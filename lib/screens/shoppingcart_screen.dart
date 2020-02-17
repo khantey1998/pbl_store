@@ -351,7 +351,7 @@ class _ShoppingCartState extends State<ShoppingCartScreen> {
                             color: Colors.blueGrey,
                             onPressed: () async {
                               List<AddressModel> responseJson =
-                                  await NetworkUtils.getAddress(_id);
+                                  await NetworkUtils.getAllAddress(_id);
                               if (responseJson == null) {
                                 showDialog(
                                     context: context,
@@ -500,8 +500,9 @@ class _ShoppingCartState extends State<ShoppingCartScreen> {
     );
   }
   getAddress(String id) async {
-    return await NetworkUtils.getAddress(id);
+    return await NetworkUtils.getAllAddress(id);
   }
+
   List<Widget> getProductTiles() {
     List<Widget> list = [];
     if (cart != null) {

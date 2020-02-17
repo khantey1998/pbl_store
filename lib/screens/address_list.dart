@@ -35,7 +35,7 @@ class _AddressListState extends State<AddressList> {
   }
 
   _getAddresses(String id) async{
-    List<AddressModel> addresses = await NetworkUtils.getAddress(id);
+    List<AddressModel> addresses = await NetworkUtils.getAllAddress(id);
     return addresses;
   }
   @override

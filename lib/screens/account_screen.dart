@@ -68,7 +68,11 @@ import 'package:pbl_store/models/order_model.dart';
 import 'package:pbl_store/screens/order_list.dart';
 import 'package:pbl_store/screens/personal_data.dart';
 import 'package:pbl_store/screens/address_list.dart';
-import 'dart:convert';
+import 'package:pbl_store/screens/contact_us_screen.dart';
+import 'package:pbl_store/screens/about_screen.dart';
+import 'package:pbl_store/screens/help_center.dart';
+import 'package:random_string_one/constants.dart';
+import 'package:random_string_one/random_string.dart';
 
 class AccountScreen extends StatefulWidget {
   @override
@@ -82,9 +86,7 @@ class _AccountScreenState extends State<AccountScreen> {
   ShoppingCart cart;
   SharedPreferences _sharedPreferences;
 
-  var _authToken, _id, _name, _homeResponse;
-
-
+  var _authToken, _id, _name;
 
   @override
   void initState() {
@@ -206,12 +208,13 @@ class _AccountScreenState extends State<AccountScreen> {
                 margin: const EdgeInsets.all(0.0),
                 child: ListTile(
                   onTap: ()async{
-                    List<OrderModel> order = await NetworkUtils.getLatestOrder();},
+                    CategoryModel r = await NetworkUtils.getOneCategory("3");
+                    print(r.associationModel.filterPs[0].id);
+                    },
                   leading: Icon(Icons.settings),
                   title: Text('Setting'),
                   trailing: Icon(Icons.arrow_forward_ios),
                 ),
-
               ),
               Card(
                 margin: const EdgeInsets.all(0.0),
@@ -220,7 +223,7 @@ class _AccountScreenState extends State<AccountScreen> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => Data()),
+                          builder: (context) => Data(id: _id,)),
                     );
                   },
                   leading: Icon(Icons.person),
@@ -238,7 +241,7 @@ class _AccountScreenState extends State<AccountScreen> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => AddressList()),
+                          builder: (context) => AddressList(),),
                     );
                   },
                 ),
@@ -251,6 +254,11 @@ class _AccountScreenState extends State<AccountScreen> {
                 margin: const EdgeInsets.all(0.0),
                 child: ListTile(
                   onTap: (){
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => HelpCenter(),),
+                    );
                   },
                   leading: Icon(Icons.headset_mic),
                   title: Text('Help Center'),
@@ -260,6 +268,13 @@ class _AccountScreenState extends State<AccountScreen> {
               Card(
                 margin: const EdgeInsets.all(0.0),
                 child: ListTile(
+                  onTap: (){
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => AboutUs()),
+                    );
+                  },
                   leading: Icon(Icons.wb_incandescent),
                   title: Text('About Us'),
                   trailing: Icon(Icons.arrow_forward_ios),
@@ -268,16 +283,12 @@ class _AccountScreenState extends State<AccountScreen> {
               Card(
                 margin: const EdgeInsets.all(0.0),
                 child: ListTile(
-
-                onTap: ()async{
-                 var re = await NetworkUtils.getAllCategories();
-//                 print(re);
-//                 final responseJson = (json.decode(re)["categories"] as List)
-//                        .map((data) => CategoryModel.fromJson(data))
-//                        .toList();
-
-                    print(re);
-
+                  onTap: (){
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => ContactUs(userId: _id,)),
+                    );
                   },
                   leading: Icon(Icons.contact_phone),
                   title: Text('Contact Us'),

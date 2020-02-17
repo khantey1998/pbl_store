@@ -11,9 +11,11 @@ class Customer{
   String active;
   String idDefaultGroup;
   AssociationModel associationModel;
+  String birthday;
 
 
-  Customer({this.idShop, this.idLang,this.firstName, this.lastName, this.idDefaultGroup, this.id, this.password, this.securityKey, this.email, this.active, this.associationModel});
+  Customer({this.idShop, this.idLang,this.firstName, this.lastName, this.idDefaultGroup, this.birthday,
+    this.id, this.password, this.securityKey, this.email, this.active, this.associationModel});
   factory Customer.fromJson(Map<String, dynamic> parsedJson) {
     return Customer(
         firstName: parsedJson['firstname'] as String,
@@ -21,6 +23,7 @@ class Customer{
         id: parsedJson['id'].toString(),
         password: parsedJson['passwd'],
         email: parsedJson['email'],
+        birthday: parsedJson['birthday'],
         securityKey: parsedJson['secure_key'],
         idDefaultGroup: parsedJson['id_default_group']
     );
@@ -33,6 +36,24 @@ class Customer{
     map["email"] = this.email;
     map["active"] = this.active;
     map["id"] = this.id;
+    map["birthday"] = this.birthday;
+    map["id_shop"] = this.idShop;
+    map["id_lang"] = this.idLang;
+    //map["associations"] = this.associationModel;
+    map["associations"] = associationModel.groupMap();
+    map["id_default_group"] = this.idDefaultGroup;
+    return map;
+  }
+  Map updateMap(){
+    var map = Map<String, dynamic>();
+    map["id"] = this.id;
+    map["firstname"] = this.firstName;
+    map["lastname"] = this.lastName;
+    map["passwd"] = this.password;
+    map["email"] = this.email;
+    map["active"] = this.active;
+    map["id"] = this.id;
+    map["birthday"] = this.birthday;
     map["id_shop"] = this.idShop;
     map["id_lang"] = this.idLang;
     //map["associations"] = this.associationModel;

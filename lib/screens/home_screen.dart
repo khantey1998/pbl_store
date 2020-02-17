@@ -43,7 +43,6 @@ class _HomeScreenState extends State<HomeScreen> {
           if (snapshot.hasData) {
             productList = snapshot.data;
             for (ProductModel i in productList) {
-              print(i.associations.categories.length);
               for (var j in i.associations.categories) {
                 if (j.id == "4") {
                   powerToolList.add(i);
@@ -190,56 +189,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ],
                   ),
-
-//          FutureBuilder(
-//            future: getCategories(),
-//            builder: (BuildContext context, AsyncSnapshot snapshot) {
-//              if (snapshot.hasData) {
-//                categoriesList = snapshot.data;
-//                return Padding(
-//                  padding: EdgeInsets.all(4),
-//                  child: StaggeredGridView.count(
-//                    physics: ScrollPhysics(),
-//                    shrinkWrap: true,
-//                    crossAxisCount: 4,
-//                    padding: EdgeInsets.all(2),
-//                    children: categoriesList.where((cat)=>cat.idParent == "3" ||cat.idParent == "4" ||cat.idParent == "5").map((cat) {
-//                      print(" name "+ cat.name);
-//
-//                      return Container(
-//                          padding: EdgeInsets.all(10.0),
-//
-//                          child: GestureDetector(
-//                            child:  CircleAvatar(
-//                              child: Icon(Icons.work),
-//                              backgroundColor: Colors.green ,
-//                            ),
-//                            onTap: () {
-//
-////                              Navigator.push(
-////                                  context,
-////                                  MaterialPageRoute(
-////                                      builder: (context) => ProductDetailPage(
-////                                        product: product,
-////                                      )));
-//                            },
-//                          ));
-//                    }).toList(),
-//                    staggeredTiles: snapshot.data
-//                        .map<StaggeredTile>((_) => StaggeredTile.fit(1))
-//                        .toList(),
-//                    mainAxisSpacing: 3.0,
-//                    crossAxisSpacing: 4.0,
-//                  ),
-//                );
-//              } else {
-//                return Center(
-//                  child: CircularProgressIndicator(),
-//                );
-//              }
-//            },
-//          ),
-
                   Container(
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.all(Radius.circular(5)),
@@ -251,7 +200,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         border: Border.all(
                             width: 1,
                             color: Colors.transparent,
-                            style: BorderStyle.solid)),
+                            style: BorderStyle.solid),),
                     padding: EdgeInsets.all(10),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,

@@ -17,12 +17,12 @@ class CategoryModel{
 
     return CategoryModel(
       id: parsedJson['id'].toString(),
-      name: parsedJson['name'] ,
+      name: parsedJson['name'],
       idParent: parsedJson['id_parent'],
       levelDept: parsedJson['level_depth'],
       active: parsedJson['active'],
       numberProductRecursive: parsedJson['nb_products_recursive'].toString(),
-      associationModel: CatAsso.fromJson(parsedJson['associations'])
+      associationModel: CatAsso.fromJson(parsedJson['associations'])!=null?CatAsso.fromJson(parsedJson['associations']):CatAsso(filterPs: List())
     );
   }
 

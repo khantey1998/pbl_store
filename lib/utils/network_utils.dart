@@ -16,6 +16,10 @@ import 'package:pbl_store/models/manufacturer_model.dart';
 import 'package:pbl_store/models/order_model.dart';
 import 'package:pbl_store/models/order_status.dart';
 import 'package:pbl_store/models/order_history.dart';
+import 'package:pbl_store/models/contact_model.dart';
+import 'package:pbl_store/models/customer_thread_model.dart';
+import 'package:pbl_store/models/customer_message_model.dart';
+import 'package:pbl_store/models/cat_id.dart';
 
 class NetworkUtils {
   static final String host = productionHost;
@@ -107,7 +111,7 @@ class NetworkUtils {
     }
   }
 
-  static fetch(String email) async {
+  static fetchByEmail(String email) async {
     var url = Uri.http(
         host, "/api/customers", {'filter[email]': email, 'display': 'full'});
     try {
@@ -128,10 +132,48 @@ class NetworkUtils {
       }
     }
   }
+  static fetchByID(String id) async {
+    var url = Uri.http(
+        host, "/api/customers/$id");
+    try {
+      final response = await http.get(
+        url,
+      );
+      final responseJson = json.decode(response.body)['customer'];
+      return Customer.fromJson(responseJson);
+    } catch (exception) {
+      if (exception.toString().contains('SocketException')) {
+        return 'NetworkError';
+      } else if (exception.toString().contains('TimeoutException')) {
+        return 'RequestTimeOut';
+      } else {
+        return null;
+      }
+    }
+  }
 
   static dynamic registerUser({String body}) async {
     try {
       return await http.post(
+          "http://3Q49Q5T8GNBFV7MPR7HG9FT4EP92Q4ZB@pblstore.com/api/customers",
+          body: body,
+          headers: {
+            "Content-Type": "application/json"
+          }).then((a) => a.statusCode == 201 ? "success" : a.statusCode);
+    } catch (exception) {
+      if (exception.toString().contains('SocketException')) {
+        return 'NetworkError';
+      } else if (exception.toString().contains('TimeoutException')) {
+        return 'RequestTimeOut';
+      } else {
+        return null;
+      }
+    }
+  }
+
+  static dynamic updateUser({String body}) async {
+    try {
+      return await http.put(
           "http://3Q49Q5T8GNBFV7MPR7HG9FT4EP92Q4ZB@pblstore.com/api/customers",
           body: body,
           headers: {
@@ -279,7 +321,7 @@ class NetworkUtils {
     }
   }
 
-  static getAddress(String idCustomer) async {
+  static getAllAddress(String idCustomer) async {
     var url = Uri.http(host, "/api/addresses", {
       'filter[id_customer]': idCustomer,
       'filter[deleted]': '0',
@@ -294,6 +336,24 @@ class NetworkUtils {
           .toList();
 
       return responseJson;
+    } catch (exception) {
+      if (exception.toString().contains('SocketException')) {
+        return 'NetworkError';
+      } else if (exception.toString().contains('TimeoutException')) {
+        return 'RequestTimeOut';
+      } else {
+        return null;
+      }
+    }
+  }
+
+  static getOneAddress(String idAddress) async {
+    var url = Uri.http(host, "/api/addresses/$idAddress");
+    try {
+      final response = await http.get(
+        url,
+      );
+      return AddressModel.fromJson(json.decode(response.body)['address']);
     } catch (exception) {
       if (exception.toString().contains('SocketException')) {
         return 'NetworkError';
@@ -330,7 +390,7 @@ class NetworkUtils {
         'Content-Type': 'application/json; charset=utf-8',
       });
       final responseJson = (json.decode(response.body)['categories'] as List)
-          .map((data) => CategoryModel.fromJson(data))
+          .map((data) => CategoryID.fromJson(data))
           .toList();
       return responseJson;
     } catch (exception) {
@@ -388,9 +448,9 @@ class NetworkUtils {
     }
   }
 
-  static dynamic getOrders(String id) async {
+  static dynamic getOrders(String customerId) async {
     var url = Uri.http(
-        host, "/api/orders", {'display': 'full', "filter[id_customer]": id});
+        host, "/api/orders", {'display': 'full', "filter[id_customer]": customerId});
     try {
       final response = await http.get(url, headers: {
         'Content-Type': 'application/json; charset=utf-8',
@@ -411,37 +471,6 @@ class NetworkUtils {
     }
   }
 
-//  static dynamic getOrderStatus(String idOrder) async {
-//    var url1 = Uri.http(host, "/api/order_histories",
-//        {'display': 'full', " filter[id_order]": idOrder});
-//    try {
-//      final result = await http.get(url1, headers: {
-//        'Content-Type': 'application/json; charset=utf-8',
-//      });
-//      final status = (json.decode(result.body)['order_histories'] as List)
-//          .map((data) => OrderHistory.fromJson(data))
-//          .toList();
-//      OrderHistory order = status[status.length-1];
-//
-//      var url = Uri.http(host, "/api/order_states/${order.idOrderStatus}");
-//      final response = await http.get(
-//          url,
-//          headers: {
-//            'Content-Type': 'application/json; charset=utf-8',
-//          }
-//      );
-//      final responseJson = json.decode(response.body)['order_state'];
-//      return OrderStatus.fromJson(responseJson);
-//    } catch (exception) {
-//      if (exception.toString().contains('SocketException')) {
-//        return 'NetworkError';
-//      } else if (exception.toString().contains('TimeoutException')) {
-//        return 'RequestTimeOut';
-//      } else {
-//        return null;
-//      }
-//    }
-//  }
   static dynamic getAllOrderStatus(String idOrder) async {
     var url1 = Uri.http(host, "/api/order_histories",
         {'display': 'full', " filter[id_order]": idOrder});
@@ -469,6 +498,106 @@ class NetworkUtils {
         i--;
       }
       return orderStatus;
+    } catch (exception) {
+      if (exception.toString().contains('SocketException')) {
+        return 'NetworkError';
+      } else if (exception.toString().contains('TimeoutException')) {
+        return 'RequestTimeOut';
+      } else {
+        return null;
+      }
+    }
+  }
+  static getAllContact() async {
+    var url = Uri.http(host, "/api/contacts", {
+      'display': 'full'
+    });
+    try {
+      final response = await http.get(
+        url,
+      );
+      final responseJson = (json.decode(response.body)['contacts'] as List)
+          .map((data) => ContactModel.fromJson(data))
+          .toList();
+
+      return responseJson;
+    } catch (exception) {
+      if (exception.toString().contains('SocketException')) {
+        return 'NetworkError';
+      } else if (exception.toString().contains('TimeoutException')) {
+        return 'RequestTimeOut';
+      } else {
+        return null;
+      }
+    }
+  }
+  static dynamic getCustomerThread(String idOrder) async {
+    var url = Uri.http(host, "/api/customer_threads",
+        {'display': 'full', " filter[id_order]": idOrder});
+    try {
+      final result = await http.get(url, headers: {
+        'Content-Type': 'application/json; charset=utf-8',
+      });
+      print(url);
+      print(result.body);
+
+      final thread = (json.decode(result.body)['customer_threads'] as List)
+          .map((data) => CustomerThreadModel.fromJson(data))
+          .toList();
+      return thread;
+    } catch (exception) {
+      if (exception.toString().contains('SocketException')) {
+        return 'NetworkError';
+      } else if (exception.toString().contains('TimeoutException')) {
+        return 'RequestTimeOut';
+      } else {
+        return null;
+      }
+    }
+  }
+  static dynamic createCustomerThread({String body}) async {
+    var url = Uri.http(host, "/api/customer_threads");
+    try {
+      var response = await http
+          .post(url, body: body, headers: {"Content-Type": "application/json"});
+      print(response.body);
+      final responseJson = json.decode(response.body)['customer_thread'];
+      print(responseJson);
+      return CustomerThreadModel.fromJson(responseJson);
+    } catch (exception) {
+      if (exception.toString().contains('SocketException')) {
+        return 'NetworkError';
+      } else if (exception.toString().contains('TimeoutException')) {
+        return 'RequestTimeOut';
+      } else {
+        return exception;
+      }
+    }
+  }
+  static dynamic createCustomerMessage({String body}) async {
+    var url = Uri.http(host, "/api/customer_messages");
+    try {
+      var response = await http
+          .post(url, body: body, headers: {"Content-Type": "application/json"});
+      final responseJson = json.decode(response.body)['customer_message'];
+      return CustomerMessageModel.fromJson(responseJson);
+    } catch (exception) {
+      if (exception.toString().contains('SocketException')) {
+        return 'NetworkError';
+      } else if (exception.toString().contains('TimeoutException')) {
+        return 'RequestTimeOut';
+      } else {
+        return null;
+      }
+    }
+  }
+  static getOneCategory(String idCategory) async {
+    var url = Uri.http(host, "/api/categories/$idCategory");
+    try {
+      final response = await http.get(
+        url,
+      );
+      return CategoryModel.fromJson(json.decode(response.body)['category']);
     } catch (exception) {
       if (exception.toString().contains('SocketException')) {
         return 'NetworkError';

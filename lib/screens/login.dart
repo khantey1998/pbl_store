@@ -158,7 +158,7 @@ class LoginPageState extends State<LoginPage> {
       } else if(responseJson == 'NetworkError') {
         NetworkUtils.showSnackBar(_scaffoldKey, 'NetworkError');
       } else {
-        var responseJson = await NetworkUtils.fetch(_emailController.text);
+        var responseJson = await NetworkUtils.fetchByEmail(_emailController.text);
 
         ShoppingCart newCart = ShoppingCart(
             secureKey: responseJson[0].securityKey,

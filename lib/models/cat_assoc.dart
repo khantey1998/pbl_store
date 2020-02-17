@@ -5,19 +5,17 @@ class CatAsso{
 
   CatAsso({this.filterPs});
   factory CatAsso.fromJson(Map<String, dynamic> parsedJson) {
-    var product = parsedJson['products'] as List;
+    var product = parsedJson['products'];
     List<ProductInCategory> filteredProductList = List();
 
 
     if(product != null){
       print(product);
-      //filteredProductList = List<ProductInCategory>.from(product.map<ProductInCategory>((i) => ProductInCategory.fromJson(i)));
-      filteredProductList = (product).map((data) => ProductInCategory.fromJson(data))
-          .toList();
+      filteredProductList = List<ProductInCategory>.from(product.map<ProductInCategory>((i) => ProductInCategory.fromJson(i)));
+      //filteredProductList = (product).map((data) => ProductInCategory.fromJson(data)).toList();
     }
     return CatAsso(
-        filterPs: parsedJson["products"]!=null?List<ProductInCategory>.from(parsedJson["products"].map((x) => ProductInCategory.fromJson(x))):List<ProductInCategory>(),
-
+      filterPs: filteredProductList,
     );
   }
 }

@@ -78,7 +78,7 @@ class _RegisterState extends State<Register>{
         var registerRes = await NetworkUtils.registerUser(body: str);
         _sharedPreferences = await _prefs;
         if(registerRes == "success"){
-          List<Customer> responseJson = await NetworkUtils.fetch(_emailController.text);
+          List<Customer> responseJson = await NetworkUtils.fetchByEmail(_emailController.text);
 
           ShoppingCart newCart = ShoppingCart(
               secureKey: responseJson[0].securityKey,

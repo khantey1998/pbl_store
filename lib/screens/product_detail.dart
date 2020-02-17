@@ -289,6 +289,8 @@ class _ProductDetailPageState extends State<ProductDetailPage>
 
   _buildDetailsAndMaterialWidgets() {
     TabController tabController = new TabController(length: 2, vsync: this);
+    var des = widget.product.description;
+    print(des);
     return Container(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -324,7 +326,7 @@ class _ProductDetailPageState extends State<ProductDetailPage>
               children: <Widget>[
                 SingleChildScrollView(
                   child: Html(
-                    data: """${widget.product.description}""",
+                    data: """$des""",
                   ),
                 ),
                 SingleChildScrollView(
@@ -433,7 +435,7 @@ class _ProductDetailPageState extends State<ProductDetailPage>
                           ],
                         ),
                         onTap: () {
-                          Navigator.pushReplacement(
+                          Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) => ProductDetailPage(
@@ -450,7 +452,10 @@ class _ProductDetailPageState extends State<ProductDetailPage>
             ],
           );
         } else {
-          return Container();
+          return Container(
+            padding: EdgeInsets.all(20),
+            child: Center(child: CircularProgressIndicator(),),
+          );
         }
       },
     );

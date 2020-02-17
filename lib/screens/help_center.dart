@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-class ContactUs extends StatelessWidget{
+
+class HelpCenter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -7,17 +8,16 @@ class ContactUs extends StatelessWidget{
         centerTitle: true,
         leading: IconButton(
           icon: Icon(
-            Icons.chevron_left,
-            size: 40.0,
+            Icons.arrow_back,
             color: Colors.black,
           ),
           onPressed: () {
-            Navigator.of(context).pop();
+            Navigator.pop(context);
           },
         ),
         backgroundColor: Colors.white,
         title: Text(
-          "Contact Us",
+          "Help Center",
           style: TextStyle(
             color: Colors.black,
           ),
@@ -27,11 +27,10 @@ class ContactUs extends StatelessWidget{
         scrollDirection: Axis.vertical,
         children: <Widget>[
           Column(
-            children:[
+            children: [
               Container(
-                padding: const EdgeInsets.all(32),
-                child:Image.asset(
-                  'images/pbl-store-logo.jpg',
+                child: Image.asset(
+                  'assets/logo.png',
                   fit: BoxFit.cover,
                 ),
               ),
@@ -42,10 +41,9 @@ class ContactUs extends StatelessWidget{
                 child: ListTile(
                   leading: Icon(Icons.location_on),
                   title: Text('Address :'),
-                  subtitle: Text("#88, St. 271, Sangkat Tek Tla, Khhan Sen Sok, Phnom Penh."),
+                  subtitle: Text(
+                      "#88, St. 271, Sangkat Tek Tla, Khhan Sen Sok, Phnom Penh."),
                 ),
-
-
               ),
               Card(
                 elevation: 1,
@@ -56,8 +54,6 @@ class ContactUs extends StatelessWidget{
                   title: Text('Email: '),
                   subtitle: Text("info@pblstore.com"),
                 ),
-
-
               ),
               Card(
                 elevation: 1,
@@ -66,10 +62,8 @@ class ContactUs extends StatelessWidget{
                 child: ListTile(
                   leading: Icon(Icons.phone),
                   title: Text('Phone: '),
-                  subtitle: Text("(+855) 23 883 073"),
+                  subtitle: Text("(+855) 95 888 488"),
                 ),
-
-
               ),
               Card(
                 elevation: 1,
@@ -80,24 +74,18 @@ class ContactUs extends StatelessWidget{
                   title: Text('Open Time:'),
                   subtitle: Text(" 8:00AM - 6:00PM"),
                 ),
-
-
               ),
               SizedBox(
                 height: 20.0,
               ),
-              Text("© 2019 PBLStore.")
-
-
-
+              Text("Â© 2019 PBLStore."),
+              SizedBox(
+                height: 20.0,
+              ),
             ],
-
-
           ),
         ],
       ),
-
     );
   }
-
 }
