@@ -10,9 +10,7 @@ class CatAsso{
 
 
     if(product != null){
-      print(product);
       filteredProductList = List<ProductInCategory>.from(product.map<ProductInCategory>((i) => ProductInCategory.fromJson(i)));
-      //filteredProductList = (product).map((data) => ProductInCategory.fromJson(data)).toList();
     }
     return CatAsso(
       filterPs: filteredProductList,

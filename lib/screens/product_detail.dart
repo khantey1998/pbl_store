@@ -14,6 +14,8 @@ import 'package:pbl_store/utils/auth_utils.dart';
 import 'package:pbl_store/screens/shoppingcart_screen.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:pbl_store/utils/network_utils.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:pbl_store/screens/shopping_cart_full_screen.dart';
 
 class ProductDetailPage extends StatefulWidget {
   final ProductModel product;
@@ -28,9 +30,16 @@ class _ProductDetailPageState extends State<ProductDetailPage>
   Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   var _authToken, _id, _name, _homeResponse;
 
-  String baseUrl = "http://3Q49Q5T8GNBFV7MPR7HG9FT4EP92Q4ZB@pblstore.com/api";
+  String baseUrl = "https://3Q49Q5T8GNBFV7MPR7HG9FT4EP92Q4ZB@pblstore.com/api";
   StockAvailableModel stock = StockAvailableModel();
   int _n = 1;
+  _launchURL(url) async {
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
 
   @override
   void initState() {
@@ -120,7 +129,86 @@ class _ProductDetailPageState extends State<ProductDetailPage>
                 SizedBox(height: 4.0),
                 _buildMoreInfoData(),
                 SizedBox(height: 24.0),
-                _buildRelatedProducts(),
+                FutureBuilder(
+                  future: _getRelatedProducts(),
+                  builder: (BuildContext context, AsyncSnapshot snapshot) {
+                    if (snapshot.hasData) {
+                      List<ProductModel> pList = snapshot.data;
+                      return Column(
+                        children: <Widget>[
+                          _buildDivider(MediaQuery.of(context).size),
+                          SizedBox(height: 24.0),
+                          Text(
+                            "RELATED PRODUCTS",
+                            style: TextStyle(fontSize: 16),
+                          ),
+                          SizedBox(
+                            height: 24,
+                          ),
+                          Container(
+                            height: 230,
+                            child: ListView.builder(
+                              itemCount: pList.length,
+                              scrollDirection: Axis.horizontal,
+                              itemBuilder: (context, index) {
+                                return Container(
+                                  margin: EdgeInsets.all(2.0),
+                                  padding: EdgeInsets.all(10.0),
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                      color: Colors.black26,
+                                      width: 0.5,
+                                    ),
+                                  ),
+                                  child: GestureDetector(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: <Widget>[
+                                        CachedNetworkImage(
+                                          imageUrl:
+                                              '$baseUrl/images/products/${pList[index].id.toString()}/${pList[index].idDefaultImage}/small_default',
+                                          placeholder: (context, url) =>
+                                              Image.asset('assets/p.png'),
+                                          width: 150,
+                                          fit: BoxFit.fitHeight,
+                                        ),
+                                        SizedBox(
+                                          height: 10,
+                                        ),
+                                        Text(pList[index].name),
+                                        Text(
+                                            "\$${double.parse(pList[index].price)}"),
+                                      ],
+                                    ),
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              ProductDetailPage(
+                                            product: pList[index],
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ],
+                      );
+                    } else {
+                      return Container(
+                        padding: EdgeInsets.all(20),
+                        child: Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                      );
+                    }
+                  },
+                ),
               ],
             ),
           ),
@@ -160,7 +248,7 @@ class _ProductDetailPageState extends State<ProductDetailPage>
                         .map(
                           (image) => CachedNetworkImage(
                             imageUrl:
-                                '$baseUrl/images/products/${widget.product.id.toString()}/${image.id}',
+                                '$baseUrl/images/products/${widget.product.id.toString()}/${image.id}/home_default',
                             placeholder: (context, url) =>
                                 Image.asset('assets/p.png'),
                             fit: BoxFit.fitHeight,
@@ -269,7 +357,6 @@ class _ProductDetailPageState extends State<ProductDetailPage>
     var res = await http.get(
         '$baseUrl/stock_availables/${widget.product.associations.stockAvailable[0].id}');
     if (res.statusCode == 200) {
-
       final response = json.decode(res.body)['stock_available'];
       return StockAvailableModel.fromJson(response);
     } else
@@ -290,7 +377,6 @@ class _ProductDetailPageState extends State<ProductDetailPage>
   _buildDetailsAndMaterialWidgets() {
     TabController tabController = new TabController(length: 2, vsync: this);
     var des = widget.product.description;
-    print(des);
     return Container(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -322,11 +408,13 @@ class _ProductDetailPageState extends State<ProductDetailPage>
             height: MediaQuery.of(context).size.height * 0.4,
             child: TabBarView(
               controller: tabController,
-
               children: <Widget>[
                 SingleChildScrollView(
                   child: Html(
                     data: """$des""",
+                    onLinkTap: (url) {
+                      _launchURL(url);
+                    },
                   ),
                 ),
                 SingleChildScrollView(
@@ -334,7 +422,6 @@ class _ProductDetailPageState extends State<ProductDetailPage>
                     child: Text("No Reviews For This product yet"),
                   ),
                 ),
-
               ],
             ),
           ),
@@ -377,12 +464,14 @@ class _ProductDetailPageState extends State<ProductDetailPage>
       for (int i = 0;
           i < widget.product.associations.relatedProducts.length;
           i++) {
-        var res = await NetworkUtils.getSingleProduct(widget.product.associations.relatedProducts[i].id);
+        var res = await NetworkUtils.getSingleProduct(
+            widget.product.associations.relatedProducts[i].id);
         relatedProductList.add(res);
       }
     }
     return relatedProductList;
   }
+
   _buildRelatedProducts() {
     return FutureBuilder(
       future: _getRelatedProducts(),
@@ -421,7 +510,7 @@ class _ProductDetailPageState extends State<ProductDetailPage>
                           children: <Widget>[
                             CachedNetworkImage(
                               imageUrl:
-                                  '$baseUrl/images/products/${pList[index].id.toString()}/${pList[index].idDefaultImage}',
+                                  '$baseUrl/images/products/${pList[index].id.toString()}/${pList[index].idDefaultImage}/small_default',
                               placeholder: (context, url) =>
                                   Image.asset('assets/p.png'),
                               width: 150,
@@ -454,7 +543,9 @@ class _ProductDetailPageState extends State<ProductDetailPage>
         } else {
           return Container(
             padding: EdgeInsets.all(20),
-            child: Center(child: CircularProgressIndicator(),),
+            child: Center(
+              child: CircularProgressIndicator(),
+            ),
           );
         }
       },
@@ -484,8 +575,12 @@ class _ProductDetailPageState extends State<ProductDetailPage>
                 ),
               ),
               onPressed: () {
-                Navigator.pushReplacement(context,
-                    MaterialPageRoute(builder: (context) => MainHomePage()));
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MainHomePage(),
+                  ),
+                );
               },
             ),
           ),
@@ -493,139 +588,147 @@ class _ProductDetailPageState extends State<ProductDetailPage>
             fit: FlexFit.tight,
             flex: 3,
             child: RaisedButton(
-              onPressed: () {
-                showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: Text(
-                          widget.product.name,
-                          style: TextStyle(fontSize: 16),
-                        ),
-                        content: StatefulBuilder(
-                          builder:
-                              (BuildContext context, StateSetter setState) {
-                            return Container(
-                              width: double.maxFinite,
-                              child: ListView(
-                                padding: EdgeInsets.all(5),
-                                children: <Widget>[
-                                  Divider(),
-                                  Text("Price "),
-                                  Text(
-                                    "\$${double.parse(widget.product.price)}",
-                                    style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  Divider(),
-                                  Text("Quantity"),
-                                  SizedBox(
-                                    height: 10,
-                                  ),
-                                  Flex(
-                                    direction: Axis.horizontal,
+              onPressed: () async {
+                stock.quantity == null
+                    ? stock = await _getStock()
+                    : showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: Text(
+                              widget.product.name,
+                              style: TextStyle(fontSize: 16),
+                            ),
+                            content: StatefulBuilder(
+                              builder:
+                                  (BuildContext context, StateSetter setState) {
+                                return Container(
+                                  width: double.maxFinite,
+                                  child: ListView(
+                                    padding: EdgeInsets.all(5),
                                     children: <Widget>[
-                                      Container(
-                                        width: 30,
-                                        height: 30,
-                                        child: RawMaterialButton(
-                                          onPressed: _n > 0
-                                              ? () {
-                                                  setState(() {
-                                                    if (_n != 0) _n--;
-                                                  });
-                                                }
-                                              : null,
-                                          shape: CircleBorder(
-                                              side: BorderSide(
+                                      Divider(),
+                                      Text("Price "),
+                                      Text(
+                                        "\$${double.parse(widget.product.price)}",
+                                        style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      Divider(),
+                                      Text("Quantity"),
+                                      SizedBox(
+                                        height: 10,
+                                      ),
+                                      Flex(
+                                        direction: Axis.horizontal,
+                                        children: <Widget>[
+                                          Container(
+                                            width: 30,
+                                            height: 30,
+                                            child: RawMaterialButton(
+                                              onPressed: _n > 0
+                                                  ? () {
+                                                      setState(() {
+                                                        if (_n != 0) _n--;
+                                                      });
+                                                    }
+                                                  : null,
+                                              shape: CircleBorder(
+                                                  side: BorderSide(
+                                                      color: _n == 0
+                                                          ? Colors.grey
+                                                          : Colors.black54,
+                                                      width: 0.8)),
+                                              child: Icon(
+                                                  const IconData(0xe15b,
+                                                      fontFamily:
+                                                          'MaterialIcons'),
                                                   color: _n == 0
                                                       ? Colors.grey
-                                                      : Colors.black54,
-                                                  width: 0.8)),
-                                          child: Icon(
-                                              const IconData(0xe15b,
-                                                  fontFamily: 'MaterialIcons'),
-                                              color: _n == 0
-                                                  ? Colors.grey
-                                                  : Colors.black),
-                                          elevation: 0.0,
-                                        ),
+                                                      : Colors.black),
+                                              elevation: 0.0,
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            width: 15,
+                                          ),
+                                          Text('$_n',
+                                              style: TextStyle(fontSize: 20.0)),
+                                          SizedBox(
+                                            width: 15,
+                                          ),
+                                          Container(
+                                            width: 30,
+                                            height: 30,
+                                            child: RawMaterialButton(
+                                              onPressed: () {
+                                                setState(() {
+                                                  _n++;
+                                                });
+                                              },
+                                              elevation: 0.0,
+                                              child: Icon(
+                                                  const IconData(0xe145,
+                                                      fontFamily:
+                                                          'MaterialIcons'),
+                                                  color: Colors.black),
+                                              shape: CircleBorder(
+                                                  side: BorderSide(
+                                                      color: Colors.black54,
+                                                      width: 0.8)),
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            width: 10,
+                                          ),
+                                          int.parse(stock.quantity == null
+                                                      ? "0"
+                                                      : stock.quantity) >
+                                                  0
+                                              ? Text(
+                                                  "${stock.quantity} available")
+                                              : Text("Not available")
+                                        ],
                                       ),
-                                      SizedBox(
-                                        width: 15,
-                                      ),
-                                      Text('$_n',
-                                          style: TextStyle(fontSize: 20.0)),
-                                      SizedBox(
-                                        width: 15,
-                                      ),
-                                      Container(
-                                        width: 30,
-                                        height: 30,
-                                        child: RawMaterialButton(
-                                          onPressed: () {
-                                            setState(() {
-                                              _n++;
-                                            });
-                                          },
-                                          elevation: 0.0,
-                                          child: Icon(
-                                              const IconData(0xe145,
-                                                  fontFamily: 'MaterialIcons'),
-                                              color: Colors.black),
-                                          shape: CircleBorder(
-                                              side: BorderSide(
-                                                  color: Colors.black54,
-                                                  width: 0.8)),
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        width: 10,
-                                      ),
-                                      int.parse(stock.quantity) > 0
-                                          ? Text("${stock.quantity} available")
-                                          : Text("Not available")
+                                      Divider(),
+                                      _buildMoreInfoHeader(),
+                                      _buildMoreInfoData()
                                     ],
                                   ),
-                                  Divider(),
-                                  _buildMoreInfoHeader(),
-                                  _buildMoreInfoData()
-                                ],
+                                );
+                              },
+                            ),
+                            actions: <Widget>[
+                              FlatButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: Text("Cancel"),
                               ),
-                            );
-                          },
-                        ),
-                        actions: <Widget>[
-                          FlatButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: Text("Cancel"),
-                          ),
-                          FlatButton(
-                            onPressed: () async {
-                              widget.product.amount = _n;
+                              FlatButton(
+                                onPressed: () async {
+                                  widget.product.amount = _n;
 
-                              BlocProvider.of<GlobalBloc>(context)
-                                  .shoppingCartBloc
-                                  .addition
-                                  .add(widget.product);
-                              Fluttertoast.showToast(
-                                  msg: "Product added to cart!",
-                                  toastLength: Toast.LENGTH_LONG,
-                                  gravity: ToastGravity.BOTTOM,
-                                  timeInSecForIos: 1,
-                                  fontSize: 16.0);
+                                  BlocProvider.of<GlobalBloc>(context)
+                                      .shoppingCartBloc
+                                      .addition
+                                      .add(widget.product);
+                                  Fluttertoast.showToast(
+                                      msg: "Product added to cart!",
+                                      toastLength: Toast.LENGTH_LONG,
+                                      gravity: ToastGravity.BOTTOM,
+                                      timeInSecForIos: 1,
+                                      fontSize: 16.0);
 
-                              _n = 1;
-                              Navigator.of(context).pop();
-                            },
-                            child: Text("Add"),
-                          ),
-                        ],
-                      );
-                    });
+                                  _n = 1;
+                                  Navigator.of(context).pop();
+                                },
+                                child: Text("Add"),
+                              ),
+                            ],
+                          );
+                        });
               },
               color: Color(0xffffdde2),
               child: Center(
@@ -652,10 +755,12 @@ class _ProductDetailPageState extends State<ProductDetailPage>
             flex: 3,
             child: RaisedButton(
               onPressed: () {
-                Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => ShoppingCartScreen()));
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ShoppingCartFullScreen(),
+                  ),
+                );
               },
               color: Colors.pinkAccent,
               child: Center(

@@ -24,7 +24,7 @@ class OrderScreen extends StatefulWidget {
 
 class _OrderScreenState extends State<OrderScreen> {
   Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
-  String baseUrl = "http://3Q49Q5T8GNBFV7MPR7HG9FT4EP92Q4ZB@pblstore.com/api";
+  String baseUrl = "https://3Q49Q5T8GNBFV7MPR7HG9FT4EP92Q4ZB@pblstore.com/api";
   SharedPreferences _sharedPreferences;
   List<OrderRow> orderRowList;
   var _authToken, _id, _name, _homeResponse;
@@ -189,7 +189,7 @@ class _OrderScreenState extends State<OrderScreen> {
 //                ),
                 CachedNetworkImage(
                   imageUrl:
-                      '$baseUrl/images/products/${p.id.toString()}/${p.idDefaultImage}',
+                      '$baseUrl/images/products/${p.id.toString()}/${p.idDefaultImage}/small_default',
                   placeholder: (context, url) =>
                       Image.asset('assets/product.jpg'),
                   fit: BoxFit.fitHeight,

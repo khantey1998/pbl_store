@@ -15,7 +15,7 @@ class ProductsByCategory extends StatefulWidget {
 }
 
 class _ProductsByCategoryState extends State<ProductsByCategory> {
-  String baseUrl = "http://3Q49Q5T8GNBFV7MPR7HG9FT4EP92Q4ZB@pblstore.com/api";
+  String baseUrl = "https://3Q49Q5T8GNBFV7MPR7HG9FT4EP92Q4ZB@pblstore.com/api";
 
   _getCategory(String categoryID) async {
     return await NetworkUtils.getOneCategory(categoryID);
@@ -24,11 +24,9 @@ class _ProductsByCategoryState extends State<ProductsByCategory> {
   _getRelatedProducts(CategoryModel categoryModel) async {
     List<ProductModel> filteredList = List();
     if (categoryModel.associationModel.filterPs.length > 0) {
-      print(categoryModel.name);
       for (int i = 0; i < categoryModel.associationModel.filterPs.length; i++) {
         ProductModel res = await NetworkUtils.getSingleProduct(
             categoryModel.associationModel.filterPs[i].id);
-        print(res.name);
         filteredList.add(res);
       }
     }
@@ -39,8 +37,13 @@ class _ProductsByCategoryState extends State<ProductsByCategory> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        iconTheme: IconThemeData(
+          color: Colors.black, //change your color here
+        ),
         backgroundColor: Colors.white,
-        title: Text("${widget.categoryID.name}", style: TextStyle(color: Colors.white),),
+        leading: Icon(Icons.arrow_back, color: Colors.black,),
+        title: Text("${widget.categoryID.name}", style: TextStyle(color: Colors.black),
+        ),
       ),
       body: FutureBuilder(
         future: _getCategory(widget.categoryID.id),
@@ -64,7 +67,7 @@ class _ProductsByCategoryState extends State<ProductsByCategory> {
                           children:
                           (productList.toList()..shuffle()).map((product) {
                             return Container(
-                                padding: EdgeInsets.all(10.0),
+
                                 decoration: BoxDecoration(
                                   border: Border.all(
                                     color: Colors.black26,
@@ -77,7 +80,7 @@ class _ProductsByCategoryState extends State<ProductsByCategory> {
                                     children: <Widget>[
                                       CachedNetworkImage(
                                         imageUrl:
-                                        '$baseUrl/images/products/${product.id.toString()}/${product.idDefaultImage}',
+                                        '$baseUrl/images/products/${product.id.toString()}/${product.idDefaultImage}/small_default',
                                         placeholder: (context, url) =>
                                             Image.asset('assets/p.png'),
                                         width: 150,

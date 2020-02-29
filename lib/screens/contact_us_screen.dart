@@ -10,6 +10,7 @@ import 'package:pbl_store/models/customer_thread_model.dart';
 import 'dart:convert';
 import 'package:random_string_one/constants.dart';
 import 'package:random_string_one/random_string.dart';
+import 'package:pbl_store/models/customer.dart';
 
 class ContactUs extends StatefulWidget {
   final String userId;
@@ -28,6 +29,15 @@ class _ContactUsState extends State<ContactUs> {
   String _errorText, _emailError, _inputError;
   bool _isError = false;
   bool _isLoading = false;
+
+  _fetch(String id)async{
+
+    Customer customer = await NetworkUtils.fetchByID(id);
+    setState(() {
+      _emailController.text = customer.email;
+
+    });
+  }
 
   _getContact() async {
     _allContacts = await NetworkUtils.getAllContact();
@@ -48,9 +58,7 @@ class _ContactUsState extends State<ContactUs> {
         for (OrderModel o in _orderReferences) {
           if (_selectedOrderReference == o.reference) {
             var customerMessage = {};
-            print(o.id);
             var checkCustomerThread = await NetworkUtils.getCustomerThread(o.id);
-            print(checkCustomerThread);
             if(checkCustomerThread == null){
               final token = randomString(
                 12,
@@ -68,21 +76,14 @@ class _ContactUsState extends State<ContactUs> {
               );
 
               for(ContactModel c in _allContacts){
-                print(_allContacts.length);
                 if(c.name.contains(_selectedContact)){
-                  print("${c.name}");
-                  print("$_selectedContact");
-                  print(c.id);
                   customerThreadModel.idContact = c.id;
-                  print(customerThreadModel.idContact);
                 }
               }
               var customerThread = {};
               customerThread["customer_thread"] = customerThreadModel.threadMap();
               String threadMap = json.encode(customerThread);
-              print(threadMap);
               var threadResult = await NetworkUtils.createCustomerThread(body: threadMap);
-              print(threadResult);
               customerMessageModel.idCustomerThread = threadResult.id;
               customerMessage["customer_message"] = customerMessageModel.msgMap();
               String messageMap = json.encode(customerMessage);
@@ -94,13 +95,11 @@ class _ContactUsState extends State<ContactUs> {
               }
             }
             else if(checkCustomerThread != null){
-              print(checkCustomerThread);
               List<CustomerThreadModel> thread = checkCustomerThread;
               customerMessageModel.idCustomerThread = thread[0].id;
               customerMessage["customer_message"] = customerMessageModel.msgMap();
               String messageMap = json.encode(customerMessage);
               var messageResult = await NetworkUtils.createCustomerMessage(body: messageMap);
-              print(messageResult);
             }
           }
         }
@@ -145,6 +144,7 @@ class _ContactUsState extends State<ContactUs> {
 
   @override
   void initState() {
+    _fetch(widget.userId);
     _emailController = TextEditingController();
     _messageController = TextEditingController();
     super.initState();

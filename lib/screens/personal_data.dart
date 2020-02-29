@@ -233,7 +233,7 @@ class _DataState extends State<Data>{
       );
     }
 
-    Text dob = Text("$selectedDate".split(" ")[0], style: TextStyle(fontSize: 20),);
+    Text dob = selectedDate!=null?Text("$selectedDate".split(" ")[0], style: TextStyle(fontSize: 20),):Text("Date of Birth");
 
     return MaterialApp(
       home: Scaffold(

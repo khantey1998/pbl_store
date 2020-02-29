@@ -19,25 +19,24 @@ import 'package:pbl_store/models/address_model.dart';
 import 'package:pbl_store/screens/order_screen.dart';
 import 'dart:convert';
 
-class ShoppingCartScreen extends StatefulWidget {
-  ShoppingCartScreen();
+class ShoppingCartFullScreen extends StatefulWidget {
+  ShoppingCartFullScreen();
 
   @override
-  _ShoppingCartState createState() => _ShoppingCartState();
+  _ShoppingCartFullState createState() => _ShoppingCartFullState();
 }
 
-class _ShoppingCartState extends State<ShoppingCartScreen> {
-
+class _ShoppingCartFullState extends State<ShoppingCartFullScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   String baseUrl = "https://3Q49Q5T8GNBFV7MPR7HG9FT4EP92Q4ZB@pblstore.com/api";
   SharedPreferences _sharedPreferences;
-  String selectedAddress;
   List<OrderRow> orderRowList;
   var _authToken, _id, _name, _homeResponse;
   bool _isLoading = false;
   ShoppingCart cart;
   String _radioValue;
+  String selectedAddress;
   Stream<ShoppingCart> streamCart;
   static TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 16.0);
   final loginButton = Material(
@@ -45,6 +44,7 @@ class _ShoppingCartState extends State<ShoppingCartScreen> {
     borderRadius: BorderRadius.circular(5.0),
     color: Color(0xff01A0C7),
     child: MaterialButton(
+//        minWidth: MediaQuery.of(context).size.width,
       padding: EdgeInsets.fromLTRB(10.0, 15.0, 10.0, 15.0),
       onPressed: () {},
       child: Text(
@@ -55,6 +55,12 @@ class _ShoppingCartState extends State<ShoppingCartScreen> {
     ),
   );
 
+
+  void setSelectRadioButton(String value, String groupValue) {
+    setState(() {
+      _radioValue = value;
+    });
+  }
   _showLoading() {
     setState(() {
       _isLoading = true;
@@ -66,13 +72,6 @@ class _ShoppingCartState extends State<ShoppingCartScreen> {
       _isLoading = false;
     });
   }
-
-  void setSelectRadioButton(String value, String groupValue) {
-    setState(() {
-      _radioValue = value;
-    });
-  }
-
   _fetchSessionAndNavigate() async {
     _sharedPreferences = await _prefs;
     String authToken = AuthUtils.getToken(_sharedPreferences);
@@ -121,10 +120,29 @@ class _ShoppingCartState extends State<ShoppingCartScreen> {
       }
     }
     return Scaffold(
+      appBar: AppBar(
+        iconTheme: IconThemeData(
+          color: Colors.black, //change your color here
+        ),
+        backgroundColor: Colors.white,
+        title: Text(
+          "Shopping Cart",
+          style: TextStyle(color: Colors.black),
+        ),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(
+              Icons.search,
+              color: Color(0xff333366),
+            ),
+            onPressed: () {},
+          ),
+        ],
+      ),
       key: _scaffoldKey,
       body: StreamBuilder(
           stream:
-              streamCart,
+          streamCart,
           builder: (context, snapshot) {
             if (!snapshot.hasData) {
               return ListView(
@@ -147,18 +165,18 @@ class _ShoppingCartState extends State<ShoppingCartScreen> {
                   ),
                   _authToken == null
                       ? Container(
-                          child: loginButton,
-                        )
+                    child: loginButton,
+                  )
                       : RaisedButton(
-                          child: Text("Go Shopping"),
-                          onPressed: () {
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => MainHomePage()),
-                            );
-                          },
-                        ),
+                    child: Text("Go Shopping"),
+                    onPressed: () {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => MainHomePage()),
+                      );
+                    },
+                  ),
                   SizedBox(
                     height: 20.0,
                   ),
@@ -188,18 +206,18 @@ class _ShoppingCartState extends State<ShoppingCartScreen> {
                     ),
                     _authToken == null
                         ? Container(
-                            child: loginButton,
-                          )
+                      child: loginButton,
+                    )
                         : RaisedButton(
-                            child: Text("Go Shopping"),
-                            onPressed: () {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => MainHomePage()),
-                              );
-                            },
-                          ),
+                      child: Text("Go Shopping"),
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => MainHomePage()),
+                        );
+                      },
+                    ),
                     SizedBox(
                       height: 20.0,
                     ),
@@ -243,10 +261,10 @@ class _ShoppingCartState extends State<ShoppingCartScreen> {
                             if (snapshot.hasData) {
                               List<AddressModel> addressList = snapshot.data;
 
-                                return ListView.builder(
-                                  shrinkWrap: true,
-                                  itemCount: addressList.length,
-                                  itemBuilder: (context, int index){
+                              return ListView.builder(
+                                shrinkWrap: true,
+                                itemCount: addressList.length,
+                                itemBuilder: (context, int index){
 //                                    return Card(
 //                                        child: Container(
 //                                          padding: EdgeInsets.all(10),
@@ -311,8 +329,8 @@ class _ShoppingCartState extends State<ShoppingCartScreen> {
                                         });
                                       },),
                                   );
-                                  },
-                                );
+                                },
+                              );
 //                              return Card(
 //                                child: Container(
 //                                  padding: EdgeInsets.fromLTRB(8, 16, 8, 16),
@@ -369,8 +387,8 @@ class _ShoppingCartState extends State<ShoppingCartScreen> {
                                             Navigator.push(
                                               context,
                                               MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      Address(),),
+                                                builder: (context) =>
+                                                    Address(),),
                                             );
                                           },
                                         ),
@@ -439,7 +457,7 @@ class _ShoppingCartState extends State<ShoppingCartScreen> {
                             color: Colors.blueGrey,
                             onPressed: () async {
                               List<AddressModel> responseJson =
-                                  await NetworkUtils.getAllAddress(_id);
+                              await NetworkUtils.getAllAddress(_id);
                               if (responseJson == null) {
                                 showDialog(
                                     context: context,
@@ -460,8 +478,8 @@ class _ShoppingCartState extends State<ShoppingCartScreen> {
                                               Navigator.push(
                                                 context,
                                                 MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        Address(),),
+                                                  builder: (context) =>
+                                                      Address(),),
                                               );
                                             },
                                             child: Text("Yes"),
@@ -625,7 +643,7 @@ class _ShoppingCartState extends State<ShoppingCartScreen> {
 //                ),
                 CachedNetworkImage(
                   imageUrl:
-                      '$baseUrl/images/products/${p.id.toString()}/${p.idDefaultImage}/cart_default',
+                  '$baseUrl/images/products/${p.id.toString()}/${p.idDefaultImage}/cart_default',
                   placeholder: (context, url) =>
                       Image.asset('assets/product.jpg'),
                   fit: BoxFit.fitHeight,

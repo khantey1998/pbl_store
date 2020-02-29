@@ -19,13 +19,13 @@ class MyApp extends StatelessWidget {
     precacheImage(AssetImage("assets/slide4.png"), context);
     precacheImage(AssetImage("assets/slide5.jpg"), context);
     precacheImage(AssetImage("assets/featured.png"), context);
-    precacheImage(AssetImage("assets/bg2.jpg"), context);
+      precacheImage(AssetImage("assets/bg2.jpg"), context);
     precacheImage(AssetImage("assets/industrial-supply.png"), context);
     precacheImage(AssetImage("assets/product.jpg"), context);
     return BlocProvider<GlobalBloc>(
       bloc: GlobalBloc(),
       child: MaterialApp(
-        title: 'Log Me In!',
+        title: 'PBL Store',
         home: Scaffold(
           body: LoginPage(),
         ),

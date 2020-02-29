@@ -2,6 +2,7 @@ import 'package:pbl_store/models/association_model.dart';
 import 'dart:convert';
 
 class ProductModel{
+  String idManufacturer;
   String name;
   String id;
   String idDefaultImage;
@@ -13,7 +14,7 @@ class ProductModel{
   int amount = 0;
 
 
-  ProductModel({this.amount, this.id, this.name, this.idDefaultImage, this.price,
+  ProductModel({this.amount, this.id, this.name, this.idDefaultImage, this.price, this.idManufacturer,
     this.associations, this.idCategoryDefault, this.description, this.shortDescription});
   factory ProductModel.fromJson(Map<String, dynamic> parsedJson) {
 
@@ -21,6 +22,7 @@ class ProductModel{
     return ProductModel(
         id: parsedJson['id'].toString(),
         name: parsedJson['name'],
+        idManufacturer: parsedJson['id_manufacturer'],
         idDefaultImage: parsedJson['id_default_image'],
         price: parsedJson['price'],
         idCategoryDefault: parsedJson['id_category_default'],

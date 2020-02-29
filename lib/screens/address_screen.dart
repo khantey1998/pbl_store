@@ -99,6 +99,10 @@ class _AddressState extends State<Address> {
         Navigator.pop(context);
         _hideLoading();
       }
+      else{
+        NetworkUtils.showSnackBar(_scaffoldKey, "Error adding new address");
+        _hideLoading();
+      }
 
     } else {
       setState(() {

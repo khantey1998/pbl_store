@@ -44,6 +44,31 @@ class CategoryState extends State<CategoryScreen> {
         future: NetworkUtils.getAllCategories(),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
           if (snapshot.hasData) {
+            print(snapshot.data);
+            if(snapshot.data == "RequestTimeOut"){
+              return Container(
+                child: Center(
+                  child: Column(
+                    children: <Widget>[
+                      Text("Request Time Out"),
+
+                    ],
+                  ),
+                ),
+              );
+            }
+            if(snapshot.data == "NetworkError"){
+              return Container(
+                child: Center(
+                  child: Column(
+                    children: <Widget>[
+                      Text("Network Error"),
+
+                    ],
+                  ),
+                ),
+              );
+            }
             categories = snapshot.data;
             var cats = categories
                 .where((cat) => cat.id != "2" && cat.id != "1")

@@ -58,7 +58,6 @@ class ShoppingCart {
         idShopGroup: "1",
         secureKey: AuthUtils.getToken(_sharedPreferences),
       );
-      //print(cart.toMap());
       var cartBody = {};
       cartBody["carts"] = cart.toMap();
       String strCart = json.encode(cartBody);
@@ -76,8 +75,6 @@ class ShoppingCart {
   void calculate() {
     totalPrice = 0;
     products.forEach((p) {
-      print("amount: ${p.amount}");
-      print("price: ${double.parse(p.price)}");
       totalPrice += p.amount*double.parse(p.price);
 //      priceNet += p.priceNet;
 //      priceGross += p.priceGross;

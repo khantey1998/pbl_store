@@ -20,6 +20,7 @@ import 'package:pbl_store/models/contact_model.dart';
 import 'package:pbl_store/models/customer_thread_model.dart';
 import 'package:pbl_store/models/customer_message_model.dart';
 import 'package:pbl_store/models/cat_id.dart';
+import 'package:pbl_store/models/content_management_system.dart';
 
 class NetworkUtils {
   static final String host = productionHost;
@@ -28,7 +29,7 @@ class NetworkUtils {
   static final String developmentHost = 'http://192.168.31.110:3000';
 
   static dynamic authenticateUser(String email) async {
-    var uri = 'http://3Q49Q5T8GNBFV7MPR7HG9FT4EP92Q4ZB@pblstore.com' +
+    var uri = 'https://3Q49Q5T8GNBFV7MPR7HG9FT4EP92Q4ZB@pblstore.com' +
         AuthUtils.endPoint;
     try {
       final response = await http.get(
@@ -65,7 +66,7 @@ class NetworkUtils {
 
   static verifyPassword(String email, String password) async {
     var isCorrect;
-    var url = Uri.http(host, "/api/customers",
+    var url = Uri.https(host, "/api/customers",
         {'filter[email]': email, 'display': '[passwd]'});
     try {
       final response = await http.get(
@@ -90,7 +91,7 @@ class NetworkUtils {
   }
 
   static checkExistingEmail(String email) async {
-    var url = Uri.http(host, "/api/customers", {'filter[email]': email});
+    var url = Uri.https(host, "/api/customers", {'filter[email]': email});
     try {
       final response = await http.get(
         url,
@@ -112,7 +113,7 @@ class NetworkUtils {
   }
 
   static fetchByEmail(String email) async {
-    var url = Uri.http(
+    var url = Uri.https(
         host, "/api/customers", {'filter[email]': email, 'display': 'full'});
     try {
       final response = await http.get(
@@ -133,7 +134,7 @@ class NetworkUtils {
     }
   }
   static fetchByID(String id) async {
-    var url = Uri.http(
+    var url = Uri.https(
         host, "/api/customers/$id");
     try {
       final response = await http.get(
@@ -155,7 +156,7 @@ class NetworkUtils {
   static dynamic registerUser({String body}) async {
     try {
       return await http.post(
-          "http://3Q49Q5T8GNBFV7MPR7HG9FT4EP92Q4ZB@pblstore.com/api/customers",
+          "https://3Q49Q5T8GNBFV7MPR7HG9FT4EP92Q4ZB@pblstore.com/api/customers",
           body: body,
           headers: {
             "Content-Type": "application/json"
@@ -174,7 +175,7 @@ class NetworkUtils {
   static dynamic updateUser({String body}) async {
     try {
       return await http.put(
-          "http://3Q49Q5T8GNBFV7MPR7HG9FT4EP92Q4ZB@pblstore.com/api/customers",
+          "https://3Q49Q5T8GNBFV7MPR7HG9FT4EP92Q4ZB@pblstore.com/api/customers",
           body: body,
           headers: {
             "Content-Type": "application/json"
@@ -191,7 +192,7 @@ class NetworkUtils {
   }
 
   static dynamic createCart({String body}) async {
-    var url = Uri.http(host, "/api/carts");
+    var url = Uri.https(host, "/api/carts");
     try {
       var response = await http
           .post(url, body: body, headers: {"Content-Type": "application/json"});
@@ -209,7 +210,7 @@ class NetworkUtils {
   }
 
   static dynamic updateCart({String body}) async {
-    var url = Uri.http(host, "/api/carts");
+    var url = Uri.https(host, "/api/carts");
     try {
       return await http.put(url, body: body, headers: {
         "Content-Type": "application/json"
@@ -226,7 +227,7 @@ class NetworkUtils {
   }
 
   static dynamic getCart(String cartID) async {
-    var url = Uri.http(host, "/api/carts/$cartID");
+    var url = Uri.https(host, "/api/carts/$cartID");
     try {
       var response = await http.get(
         url,
@@ -245,7 +246,8 @@ class NetworkUtils {
   }
 
   static getAllProducts() async {
-    var url = Uri.http(host, "/api/products", {'display': 'full'});
+    var url = Uri.https(host, "/api/products", {'display': 'full'});
+    print(url);
     try {
       final response = await http.get(url, headers: {
         'Content-Type': 'application/json; charset=utf-8',
@@ -267,7 +269,7 @@ class NetworkUtils {
   }
 
   static dynamic getSingleProduct(String productID) async {
-    var url = Uri.http(host, "/api/products/$productID");
+    var url = Uri.https(host, "/api/products/$productID");
     try {
       var response = await http.get(
         url,
@@ -384,7 +386,8 @@ class NetworkUtils {
   }
 
   static dynamic getAllCategories() async {
-    var url = Uri.http(host, "/api/categories", {'display': 'full'});
+    var url = Uri.https(host, "/api/categories", {'display': 'full'});
+    print(url);
     try {
       final response = await http.get(url, headers: {
         'Content-Type': 'application/json; charset=utf-8',
@@ -392,6 +395,7 @@ class NetworkUtils {
       final responseJson = (json.decode(response.body)['categories'] as List)
           .map((data) => CategoryID.fromJson(data))
           .toList();
+      print(responseJson);
       return responseJson;
     } catch (exception) {
       if (exception.toString().contains('SocketException')) {
@@ -598,6 +602,29 @@ class NetworkUtils {
         url,
       );
       return CategoryModel.fromJson(json.decode(response.body)['category']);
+    } catch (exception) {
+      if (exception.toString().contains('SocketException')) {
+        return 'NetworkError';
+      } else if (exception.toString().contains('TimeoutException')) {
+        return 'RequestTimeOut';
+      } else {
+        return null;
+      }
+    }
+  }
+  static getContentManagementSystem() async {
+    var url = Uri.http(host, "/api/content_management_system", {
+      'display': 'full'
+    });
+    try {
+      final response = await http.get(
+        url,
+      );
+      final responseJson = (json.decode(response.body)['content_management_system'] as List)
+          .map((data) => ContentManagementSystem.fromJson(data))
+          .toList();
+
+      return responseJson;
     } catch (exception) {
       if (exception.toString().contains('SocketException')) {
         return 'NetworkError';

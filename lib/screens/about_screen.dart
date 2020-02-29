@@ -11,15 +11,7 @@ class _AboutUsState extends State<AboutUs>
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back,
-            color: Colors.black,
-          ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
+        leading: Icon(Icons.arrow_back, color: Colors.black,),
         backgroundColor: Colors.white,
         title: Text(
           "About Us",
@@ -48,28 +40,23 @@ class _AboutUsState extends State<AboutUs>
                     decoration: TextDecoration.underline,
                     decorationStyle: TextDecorationStyle.double,
                   ),
-
                 ),
-
               ),
               Container(
                 margin: const EdgeInsets.only(left: 8,right: 8,top: 8),
                 padding: const EdgeInsets.all(8.0),
-                child:  Text("  PBL Store is one of the leading suppliers and distributor of variety of top-quality construction materials, chemical products and professional tools and equipment. We prioritize the distribution and sale of many well-known brands such as SIKA, CAPSTONE, JENBUNJERD, FERM and many more.\n\n   Over the past few years, we have yet to failed our customer expectations in providing high quality construction products and equipment. With the improvement of modern era, we strive to improve and establish ourselves to be the best in supplying and distributing high quality, top of the line product in Cambodia.\n\n    We have undertaken many projects of various scopes and sizes. All of our technical experts are the most experienced in their field,safety and environmental aspect by brand refinement with solutions based on our core capabilities to connect with a long-term and innovative approach to fit our customers’ needs."),
+                child:  Text("\tPBL Store is one of the leading suppliers and distributor of variety of top-quality construction materials, chemical products and professional tools and equipment. We prioritize the distribution and sale of many well-known brands such as SIKA, CAPSTONE, JENBUNJERD, FERM and many more.\n\n   Over the past few years, we have yet to failed our customer expectations in providing high quality construction products and equipment. With the improvement of modern era, we strive to improve and establish ourselves to be the best in supplying and distributing high quality, top of the line product in Cambodia.\n\n    We have undertaken many projects of various scopes and sizes. All of our technical experts are the most experienced in their field,safety and environmental aspect by brand refinement with solutions based on our core capabilities to connect with a long-term and innovative approach to fit our customers’ needs."),
               ),
               _buildAboutUsWidgets(),
-
               Text("© 2019 PBLStore."),
               SizedBox(height: 15,),
             ],
           ),
         ],
       ),
-
     );
-
-
   }
+
   _buildAboutUsWidgets() {
     TabController tabController = new TabController(length: 3, vsync: this);
     return Container(
